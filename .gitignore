@@ -1,0 +1,80 @@
+# IDE settings
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+.viminfo
+
+# Shell
+.zsh_history
+.bash_history
+.zcompdump*
+
+# SSH keys (never commit these!)
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+*.pem
+*.key
+
+# Sensitive config files
+config/.config/gh/hosts.yml
+config/.config/1Password/ssh/agent.sock
+config/.config/raycast/config.json
+
+# Cache and temporary files
+*.cache
+*.log
+*.pid
+*.sock
+node_modules/
+__pycache__/
+*.pyc
+
+# Local environment files
+.env
+.env.local
+
+# Machine-specific configs
+.zshrc.local
+zsh/.zshrc.local
+*.local
+.zprofile.local
+zsh/.zprofile.local
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Application support files that change frequently
+config/.config/*/cache/
+config/.config/*/Cache/
+config/.config/*/logs/
+config/.config/*/Logs/
+config/.config/*/node_modules/
