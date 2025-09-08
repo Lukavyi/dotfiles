@@ -1,0 +1,15 @@
+{
+  "name": "dotfiles-global-npm",
+  "version": "1.0.0",
+  "description": "Global NPM packages for dotfiles setup",
+  "dependencies": {
+    "@anthropic-ai/claude-code": "^1.0.108",
+    "@openai/codex": "^0.16.0",
+    "corepack": "^0.33.0",
+    "yarn": "^1.22.22"
+  },
+  "scripts": {
+    "install-global": "npm install -g @anthropic-ai/claude-code @openai/codex corepack yarn",
+    "list-global": "npm list -g --depth=0"
+  }
+}
