@@ -1,0 +1,26 @@
+#!/bin/zsh
+# Example of machine-specific configuration file
+# Copy this to ~/.zshrc.local and customize for your machine
+# This file is gitignored and won't be tracked
+
+# Machine-specific aliases
+# alias nas="mosh username@nas-hostname"
+# alias work-vpn="connect-to-work"
+
+# Machine-specific environment variables
+# export WORK_PROJECT_PATH="$HOME/work/projects"
+# export PERSONAL_NOTES="$HOME/Documents/notes"
+
+# Machine-specific PATH additions
+# export PATH="$PATH:/usr/local/custom-tool/bin"
+
+# Machine-specific functions
+# function deploy-work() {
+#     echo "Deploying to work environment..."
+#     # work-specific deployment
+# }
+
+# Load work/personal specific configs
+# if [[ $(hostname -s) == "work-macbook" ]]; then
+#     export AWS_PROFILE="work"
+# fi
