@@ -42,11 +42,6 @@ id_ed25519.pub
 *.pem
 *.key
 
-# Sensitive config files
-config/.config/gh/hosts.yml
-config/.config/1Password/ssh/agent.sock
-config/.config/raycast/config.json
-
 # Cache and temporary files
 *.cache
 *.log
@@ -71,10 +66,3 @@ zsh/.zprofile.local
 *.bak
 *.backup
 *.orig
-
-# Application support files that change frequently
-config/.config/*/cache/
-config/.config/*/Cache/
-config/.config/*/logs/
-config/.config/*/Logs/
-config/.config/*/node_modules/
