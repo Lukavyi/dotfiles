@@ -1,0 +1,13 @@
+#!/bin/zsh
+# Example of machine-specific login shell configuration
+# Copy this to ~/.zprofile.local and customize for your machine
+# This file is gitignored and won't be tracked
+
+# Machine-specific PATH additions that should run once at login
+# export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
+
+# Machine-specific environment setup
+# export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home"
+
+# Machine-specific tool initialization
+# eval "$(custom-tool init)"
