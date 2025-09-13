@@ -13,13 +13,20 @@ claude
 # NPM packages (handled by npm install)
 npm
 
+# Shared libraries (not meant to be stowed)
+lib
+
 # Documentation
 README.md
 CLAUDE.md
 
-# Git and installation files
-.gitignore
+# Scripts (remain in repo root)
 install.sh
+backup.sh
+
+# Git files
+.gitignore
+.git
 
 # macOS system files
 .DS_Store
