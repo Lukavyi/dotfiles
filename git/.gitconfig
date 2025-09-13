@@ -1,0 +1,16 @@
+[user]
+	name = lukavyi
+	email = lukavyi@me.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGKVRJeWmucRGQn6/oGsKlY4Owjjee1iG1Hc/GNnNKwZ
+[credential "https://github.com"]
+	helper = 
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !gh auth git-credential
+[gpg]
+	format = ssh
+[includeIf "gitdir/i:**"]
+	path = ~/.gitconfig.platform
+[commit]
+	gpgsign = true
