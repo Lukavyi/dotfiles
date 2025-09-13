@@ -1,0 +1,25 @@
+# Stow ignore file - prevents these directories from being stowed
+# when using commands like "stow */" or bulk stow operations
+
+# Application inventory (not user config)
+apps
+
+# Package definitions (handled by brew bundle)
+brew
+
+# Claude configuration (has its own installer)
+claude
+
+# NPM packages (handled by npm install)
+npm
+
+# Documentation
+README.md
+CLAUDE.md
+
+# Git and installation files
+.gitignore
+install.sh
+
+# macOS system files
+.DS_Store
