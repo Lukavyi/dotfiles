@@ -18,20 +18,40 @@ brew "pipx"
 brew "ripgrep"
 brew "tmux"
 brew "uv"
+brew "yq"
 brew "sst/tap/opencode"
+cask "1password"
 cask "1password-cli"
+cask "alt-tab"
+cask "arc"
+cask "betterdisplay"
+cask "discord"
 cask "docker-desktop"
+cask "ghostty"
+cask "hazel"
+cask "jetbrains-toolbox"
+cask "little-snitch"
+cask "notion"
+cask "ollama"
+cask "raycast"
+cask "setapp"
+cask "spotify"
+cask "vlc"
+cask "zoom"
 mas "1Password for Safari", id: 1569813296
 mas "Amphetamine", id: 937984704
 mas "Craft", id: 1487937127
 mas "Craft Web Clipper", id: 6748613311
+mas "Fantastical", id: 975937182
 mas "Flighty", id: 1358823008
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Photomator", id: 1444636541
 mas "Screens 5", id: 1663047912
+mas "Slack", id: 803453959
 mas "Tailscale", id: 1475387142
+mas "Telegram", id: 747648890
 mas "TestFlight", id: 899247664
 mas "The Unarchiver", id: 425424353
 mas "Timery", id: 1425368544
