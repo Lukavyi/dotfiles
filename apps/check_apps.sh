@@ -119,7 +119,7 @@ for item in /Applications/*; do
 done
 
 # Generate apps.yml
-cat > apps/apps.yml << 'EOF'
+cat > apps.yml << 'EOF'
 # Application inventory organized by installation method
 # Auto-generated from /Applications/ folder
 
@@ -128,23 +128,23 @@ EOF
 
 # Add homebrew casks
 for app in "${homebrew_list[@]}"; do
-    echo "  - $app" >> apps/apps.yml
+    echo "  - $app" >> apps.yml
 done
 
-echo "" >> apps/apps.yml
-echo "appstore:" >> apps/apps.yml
+echo "" >> apps.yml
+echo "appstore:" >> apps.yml
 
 # Add app store apps  
 for app in "${appstore_list[@]}"; do
-    echo "  - \"$app\"" >> apps/apps.yml
+    echo "  - \"$app\"" >> apps.yml
 done
 
-echo "" >> apps/apps.yml
-echo "manual:" >> apps/apps.yml
+echo "" >> apps.yml
+echo "manual:" >> apps.yml
 
 # Add manual apps
 for app in "${manual_list[@]}"; do
-    echo "  - \"$app\"" >> apps/apps.yml
+    echo "  - \"$app\"" >> apps.yml
 done
 
 echo -e "${GREEN}✓ Generated apps/apps.yml with ${#homebrew_list[@]} homebrew, ${#appstore_list[@]} appstore, and ${#manual_list[@]} manual apps${NC}"
