@@ -1,0 +1,14 @@
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential
+[gpg]
+	format = ssh
+[includeIf "gitdir/i:**"]
+	path = ~/.gitconfig.platform
+[commit]
+	gpgsign = true
+[include]
+	path = ~/.gitconfig.local

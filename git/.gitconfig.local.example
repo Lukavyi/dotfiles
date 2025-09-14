@@ -1,0 +1,16 @@
+# Personal Git Configuration
+# Copy this file to ~/.gitconfig.local and customize with your information
+# This file will NOT be tracked in the repository
+
+[user]
+	# Your name as it should appear in git commits
+	name = Your Name
+	# Your email address for git commits
+	email = your.email@example.com
+	# Your SSH signing key (if using commit signing)
+	# Get this from: ssh-add -L or your SSH key management tool
+	signingkey = ssh-ed25519 YOUR_SSH_KEY_HERE
+
+# Machine-specific credential helpers can also go here
+# [credential "https://work-gitlab.com"]
+# 	helper = manager-core
