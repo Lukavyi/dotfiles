@@ -13,8 +13,6 @@ claude
 # NPM packages (handled by npm install)
 npm
 
-# Shared libraries (not meant to be stowed)
-lib
 
 # Documentation
 README.md
