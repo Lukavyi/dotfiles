@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a personal dotfiles repository managed with GNU Stow for cross-platform shell and development environment configuration. It supports both macOS and Linux with platform-specific package management and shared configuration files.
+This is a minimal personal dotfiles repository managed with GNU Stow for macOS and Linux. It used to be ~1,500 lines of complex bash scripts but has been simplified to ~150 lines total, focusing on what actually gets used.
 
 **Important**: This repository contains personal information including git user credentials, SSH signing keys, and machine-specific configurations. It is intended solely for the owner's personal use across their own machines and should not be used as a template or shared with others.
 
@@ -12,103 +12,107 @@ This is a personal dotfiles repository managed with GNU Stow for cross-platform 
 
 ### Setup and Installation
 ```bash
-# Full automated installation (recommended)
+# Full installation
 ./install.sh
 
-# Manual installation - macOS
-brew bundle --file=brew/Brewfile
-cd npm && npm install -g && cd ..
-stow zsh git
-
-# Manual installation - Linux
-# Install system build tools first
-sudo apt-get install build-essential  # Debian/Ubuntu
-# or: sudo dnf groupinstall "Development Tools"  # Fedora
-# or: sudo pacman -S base-devel  # Arch
-
-# Install Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Install packages and configurations
-brew bundle --file=brew/Brewfile
-cd npm && npm install -g && cd ..
-stow zsh git
-
-# Install configurations only
-stow */              # Safe bulk operation (ignores non-config dirs)
-# or: stow zsh git    # Selective approach
+# Manual installation
+brew bundle --file=brew/Brewfile  # Install all packages (including stow)
+stow zsh git tmux p10k config     # Link configurations
+cd npm && npm install -g && cd .. # Install npm packages
+cd claude && bash install.sh      # Install Claude config
 ```
 
-### Package Management
+### Backup and Update
 ```bash
-# Update Brewfile with currently installed packages (cross-platform)
-brew bundle dump --file=brew/Brewfile --force
+# Backup current configuration
+./backup.sh
 
-# Check which packages are installed
-brew bundle check --file=brew/Brewfile
+# Preview what would be backed up
+./backup.sh --dry-run
 
-# Generate application inventory and check status (macOS)
+# Check macOS applications (macOS only)
 ./apps/check_apps.sh
 ```
 
 ### Configuration Management
 ```bash
-# Remove symlinks (uninstall)
-stow -D */           # Remove all configurations
-# or: stow -D zsh git  # Selective removal
+# Link configurations
+stow zsh git tmux p10k config
 
-# Re-link configurations
-stow */              # Link all configurations
-# or: stow -v zsh git  # Selective linking
-
-# Install Claude configuration
-cd claude && bash install.sh && cd ..
+# Remove configurations
+stow -D zsh git tmux p10k config
 ```
 
-## Architecture and Structure
+## Scripts
 
-### Key Directories
+### Core Scripts (simplified)
 
-- **`apps/`** - Application inventory and tracking system for macOS applications
-  - `check_apps.sh` auto-generates `apps.yml` from `/Applications/` and checks installation status
-  - Apps are categorized by installation source (homebrew_cask, appstore, manual)
-  
-- **`brew/`** - Cross-platform package management via Homebrew
-  - `Brewfile` defines CLI tools for both macOS and Linux, plus GUI apps and Mac App Store apps for macOS
-  
-- **`claude/`** - Claude Code CLI configuration with MCP server setup
-  - Contains settings.json and install script for `~/.claude/settings.json`
-  
-- **`git/`** - Cross-platform Git configuration using Stow
-  
-- **`npm/`** - Global Node.js package definitions
+- **`install.sh`** (85 lines) - Simple installer that:
+  - Installs Homebrew if needed
+  - Runs `brew bundle` to install all packages
+  - Links configs with stow (explicit list: zsh, git, tmux, p10k, config)
+  - Runs special installers (npm, claude)
+  - Checks macOS apps on macOS
 
-- **`zsh/`** - Cross-platform Zsh shell configuration
-  - Supports machine-specific local configs via `~/.zshrc.local` and `~/.zprofile.local`
+- **`backup.sh`** (66 lines) - Minimal backup that:
+  - Updates Brewfile with current packages
+  - Backs up local zsh config
+  - Updates apps inventory on macOS
+  - Supports --dry-run to preview changes
 
-### Installation Flow
+- **`apps/check_apps.sh`** (191 lines) - macOS app tracker:
+  - Scans /Applications/
+  - Categorizes by source (brew, appstore, manual)
+  - Generates apps.yml inventory
+  - Shows installation status
 
-1. **OS Detection** - Main installer detects macOS/Linux
-2. **Dependencies** - Installs Stow via appropriate package manager
-3. **System Packages** - Linux: installs build tools and system packages
-4. **Homebrew Setup** - Installs Homebrew on both platforms
-5. **Package Installation** - Installs CLI tools and packages via unified Brewfile
-6. **Stow Linking** - Creates symlinks for shared configurations (zsh, git)
-7. **Claude Setup** - Installs Claude Code CLI settings if present
-8. **Local Templates** - Creates machine-specific configuration templates
+### What Got Removed
 
-### Multi-Machine Strategy
+The repository was drastically simplified by removing:
+- **lib/** directory with 340+ lines of "framework" code
+- Dynamic directory discovery (not needed for 10 directories)
+- Pattern matching and auto-detection
+- Hooks, manifests, and configuration files
+- Interactive/verbose modes
+- Complex backup functions (SSH, GPG, history, etc.)
+- Support for multiple Linux distributions
 
-The repository supports multiple machines through:
-- Machine-specific branches (e.g., `hostname-20240101`)
-- Local configuration files (`~/.zshrc.local`, `~/.zprofile.local`)
-- Platform-specific package lists
-- Hostname-based conditionals in shell configs
+## Directory Structure
 
-### Application Management System
+- **`apps/`** - macOS application tracking
+- **`brew/`** - Brewfile with all packages (includes stow now)
+- **`claude/`** - Claude Code CLI configuration
+- **`config/`** - .config/ subdirectories (bat, gh, nvim, etc.)
+- **`git/`** - Git configuration
+- **`npm/`** - Global npm packages
+- **`p10k/`** - Powerlevel10k theme
+- **`tmux/`** - Tmux configuration
+- **`zsh/`** - Zsh with Oh My Zsh
 
-Comprehensive tracking of macOS applications:
-- **Automated categorization** by installation source
-- **Status checking** with `./apps/check_apps.sh`
-- **Manual app tracking** for applications not available via package managers
-- **Inventory updates** via system profiler integration
+## Philosophy
+
+**Explicit > Clever**: The scripts now explicitly list directories to stow rather than discovering them. This makes the code obvious and easy to modify.
+
+**YAGNI (You Aren't Gonna Need It)**: Removed features that sound useful but are rarely used in practice (interactive mode, verbose output, complex backup logic).
+
+**Maintainable**: The entire codebase can be understood in 5 minutes. When something breaks, it's immediately obvious where to look.
+
+## Common Tasks
+
+### Add a new tool directory
+1. Create the directory with your dotfiles
+2. Add it to the stow list in `install.sh` (line ~48)
+3. That's it
+
+### Add a new Homebrew package
+1. Run `brew install <package>`
+2. Run `./backup.sh` to update Brewfile
+3. Commit the changes
+
+### Check what's installed on macOS
+```bash
+cd apps && ./check_apps.sh
+```
+
+### Machine-specific configuration
+Use `~/.zshrc.local` for machine-specific settings (created automatically by install.sh)
