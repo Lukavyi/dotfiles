@@ -66,3 +66,6 @@ zsh/.zprofile.local
 *.bak
 *.backup
 *.orig
+
+# Neovim generated files
+config/.config/nvim/lazy-lock.json

@@ -1,6 +1,6 @@
 # Dotfiles
 
-Personal dotfiles managed with GNU Stow.
+Minimal, straightforward dotfiles managed with GNU Stow for macOS and Linux.
 
 ## ⚠️ Personal Repository
 
@@ -27,49 +27,31 @@ cd ~/dotfiles
 ```
 
 The installer will:
-- Detect your OS (macOS or Linux)
-- Install required dependencies (Homebrew, Stow, etc.)
-- Install packages appropriate for your platform
-- Set up configuration symlinks
-- Create machine-specific config templates
+- Install Homebrew (if needed)
+- Install all packages from Brewfile (including stow)
+- Link configurations with stow
+- Set up special installers (npm, claude)
+- Check macOS apps (on macOS only)
 
 ### Manual Installation
 
-If you prefer manual control:
+If you prefer to see each step:
 
-#### Prerequisites
-- **macOS**: Homebrew and Stow (`brew install stow`)
-- **Linux**: Stow and your distribution's package manager
-
-#### macOS Manual Setup
 ```bash
-# Install Homebrew if not present
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Install Homebrew packages and Mac App Store apps
-brew bundle --file=brew/Brewfile
-
-# Install global npm packages
-cd npm && npm install -g && cd ..
-
-# Install configurations
-stow zsh git
-```
-
-#### Linux Manual Setup
-```bash
-# Install system build tools first
-sudo apt-get install build-essential  # Debian/Ubuntu
-# or: sudo dnf groupinstall "Development Tools"  # Fedora
-# or: sudo pacman -S base-devel  # Arch
-
 # Install Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Install packages and configurations
+# Install all packages (including stow)
 brew bundle --file=brew/Brewfile
+
+# Link configurations
+stow zsh git tmux p10k config
+
+# Optional: Install npm packages
 cd npm && npm install -g && cd ..
-stow zsh git
+
+# Optional: Install Claude config
+cd claude && bash install.sh && cd ..
 ```
 
 ### Machine-Specific Configuration
@@ -81,27 +63,20 @@ The installer creates template files for machine-specific settings:
 ~/.zprofile.local   # Login shell environment variables
 ```
 
-### Using Stow Manually
+### Backup Your Configurations
 
-#### All configurations at once:
 ```bash
-# Safe bulk operation (automatically ignores non-config directories)
-stow */
+# Quick backup (updates Brewfile and apps inventory)
+./backup.sh
 
-# Or selectively specify directories
-stow -v zsh git
+# See what would be backed up without making changes
+./backup.sh --dry-run
 ```
 
-#### Individual configurations:
-```bash
-# Shell configuration
-stow -v zsh
-
-# Git configuration
-stow -v git
-```
-
-**Note**: The repository includes a `.stow-local-ignore` file that prevents accidental stowing of package management directories (`apps/`, `brew/`, `claude/`, `npm/`), so bulk operations are safe.
+This backs up:
+- Homebrew packages → `brew/Brewfile`
+- Local zsh config → `zsh/.zshrc.local.example`
+- macOS apps inventory → `apps/apps.yml` (macOS only)
 
 ## Uninstalling
 
@@ -111,11 +86,14 @@ To remove symlinks:
 stow -D */
 
 # Or selectively
-stow -D zsh git
+stow -D zsh git tmux p10k config
 
 # Or individually
 stow -D zsh
 stow -D git
+stow -D tmux
+stow -D p10k
+stow -D config
 ```
 
 ## Structure
@@ -123,9 +101,12 @@ stow -D git
 - `apps/` - Application inventory and installation tracking (macOS)
 - `brew/` - Homebrew packages (Brewfile) - cross-platform CLI tools, macOS GUI apps
 - `claude/` - Claude Code CLI configuration (MCP servers)
+- `config/` - Miscellaneous .config subdirectories (bat, gh, htop, thefuck, nvim)
 - `git/` - Git configuration (cross-platform)
 - `npm/` - Global NPM packages (cross-platform)
-- `zsh/` - Zsh shell configuration (cross-platform)
+- `p10k/` - Powerlevel10k Zsh theme configuration
+- `tmux/` - Tmux terminal multiplexer configuration
+- `zsh/` - Zsh shell configuration with Oh My Zsh (cross-platform)
 
 ## Platform-Specific Features
 
@@ -145,12 +126,26 @@ stow -D git
 - **Development tools**: Unified CLI toolchain via Homebrew (node, go, python, etc.)
 - **NPM packages**: Global Node.js packages that work everywhere
 
-## Updating Brewfile
+## Scripts
 
-To update the Brewfile with currently installed packages (works on both macOS and Linux):
-```bash
-brew bundle dump --file=brew/Brewfile --force
-```
+### `install.sh` (85 lines)
+Sets up everything from scratch:
+- Installs Homebrew
+- Installs all packages from Brewfile
+- Links configurations with stow
+- Runs special installers
+
+### `backup.sh` (66 lines)
+Backs up current machine state:
+- Updates Brewfile with installed packages
+- Saves local configurations
+- Updates apps inventory (macOS)
+
+### `apps/check_apps.sh` (macOS only)
+Tracks installed applications:
+- Categorizes by source (Homebrew, App Store, manual)
+- Shows installation status
+- Generates `apps.yml` inventory
 
 ## Application Management (macOS only)
 
@@ -162,54 +157,17 @@ The `apps/` directory provides application inventory tracking for macOS:
 
 This tracks installed applications from Homebrew Cask, Mac App Store, and manual installations. See the `apps/` directory for detailed inventory files.
 
-## Managing Dotfiles Across Multiple Machines
+## Why So Simple?
 
-### Backup Current Machine's Configs
-Before applying dotfiles from the repo, capture your current machine's setup:
+This used to be ~1,500 lines of bash with dynamic discovery, hooks, and complex backup logic. Now it's ~150 lines total. Why?
 
-```bash
-# Create a backup branch for this machine
-git checkout -b $(hostname)-$(date +%Y%m%d)
+- **Explicit > Clever**: You have 10 directories. They rarely change. A simple list is clearer than pattern matching.
+- **YAGNI**: You don't backup dotfiles daily. You don't need interactive mode, verbose flags, or pre/post hooks.
+- **Maintainable**: When something breaks in 6 months, you can understand the entire script in 2 minutes.
 
-# Dump current configs
-brew bundle dump --file=brew/Brewfile.$(hostname) --force
-npm list -g --depth=0 > npm/global-packages.$(hostname).txt
+The scripts do exactly what you need:
+1. Install your tools and link your configs
+2. Backup Brewfile when you install new tools
+3. Track macOS apps (if on macOS)
 
-# macOS only - backup app inventory
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    ls /Applications | sort > apps/installed_apps.$(hostname).txt
-fi
-
-# Compare with main configs
-diff brew/Brewfile brew/Brewfile.$(hostname)
-```
-
-### Merging Configs from Different Machines
-
-**1. For Brewfile:**
-```bash
-# Combine unique packages from multiple machines
-cat brew/Brewfile.* | grep "^brew " | sort -u > brew/Brewfile.merged
-cat brew/Brewfile.* | grep "^cask " | sort -u >> brew/Brewfile.merged
-cat brew/Brewfile.* | grep "^mas " | sort -u >> brew/Brewfile.merged
-```
-
-**2. For shell configs with machine-specific settings:**
-```bash
-# In .zshrc, use conditionals for machine-specific configs
-if [[ $(hostname) == "work-mac" ]]; then
-    export WORK_VAR="value"
-elif [[ $(hostname) == "personal-mac" ]]; then
-    export HOME_VAR="value"
-fi
-```
-
-**3. Keep machine-specific branches:**
-```bash
-git checkout -b $(hostname)
-# Make machine-specific changes
-git commit -m "Config for $(hostname)"
-# Cherry-pick universal changes to main
-git checkout main
-git cherry-pick <commit-hash>
-```
+That's it. No framework, no magic, just straightforward bash that works.
