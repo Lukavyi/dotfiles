@@ -2,14 +2,16 @@
 
 Minimal, straightforward dotfiles managed with GNU Stow for macOS and Linux.
 
-## ⚠️ Personal Repository
+## About This Repository
 
-**This repository is for personal use only and contains sensitive information:**
-- Personal name, email, and SSH signing keys in git configuration
-- Machine-specific paths and credentials
-- Not intended for sharing, forking, or use as a template
+A minimal, straightforward dotfiles setup for macOS and Linux. Feel free to fork and customize!
 
-If you're looking to create your own dotfiles repository, please start from scratch or use a dedicated dotfiles template that doesn't include personal information.
+### ⚠️ Initial Setup Required
+After installation, you'll need to configure your personal git settings in `~/.gitconfig.local`:
+- Your name and email for commits
+- SSH signing key (if using commit signing)
+
+The installer will create this file from the template (`git/.gitconfig.local.example`) and remind you to edit it.
 
 ## Installation
 
@@ -59,6 +61,7 @@ cd claude && bash install.sh && cd ..
 The installer creates template files for machine-specific settings:
 ```bash
 # Edit these files to add your local configurations
+~/.gitconfig.local  # Personal git configuration (name, email, signing key)
 ~/.zshrc.local      # Shell aliases and functions
 ~/.zprofile.local   # Login shell environment variables
 ```
@@ -102,7 +105,7 @@ stow -D config
 - `brew/` - Homebrew packages (Brewfile) - cross-platform CLI tools, macOS GUI apps
 - `claude/` - Claude Code CLI configuration (MCP servers)
 - `config/` - Miscellaneous .config subdirectories (bat, gh, htop, thefuck, nvim)
-- `git/` - Git configuration (cross-platform)
+- `git/` - Git configuration with `.gitconfig.local.example` template
 - `npm/` - Global NPM packages (cross-platform)
 - `p10k/` - Powerlevel10k Zsh theme configuration
 - `tmux/` - Tmux terminal multiplexer configuration
