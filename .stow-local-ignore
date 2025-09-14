@@ -30,3 +30,6 @@ backup.sh
 
 # macOS system files
 .DS_Store
+
+# IDE configuration
+.idea
