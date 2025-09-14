@@ -82,9 +82,34 @@ fi
 # Install all packages from Brewfile (including stow)
 if [[ -f "brew/Brewfile" ]]; then
     echo "Installing Homebrew packages..."
-    brew bundle --file=brew/Brewfile --no-lock || {
+    brew bundle --file=brew/Brewfile || {
         echo -e "${YELLOW}⚠ Some packages may have failed (normal on Linux for GUI apps)${NC}"
     }
+fi
+
+# Install Oh My Zsh if not already installed
+if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+    echo "Installing Oh My Zsh..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    echo -e "${GREEN}✓ Oh My Zsh installed${NC}"
+fi
+
+# Install Powerlevel10k theme
+if [[ ! -d "$HOME/.oh-my-zsh/custom/themes/powerlevel10k" ]]; then
+    echo "Installing Powerlevel10k theme..."
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+    echo -e "${GREEN}✓ Powerlevel10k theme installed${NC}"
+fi
+
+# Install Oh My Zsh plugins
+if [[ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" ]]; then
+    echo "Installing zsh-syntax-highlighting plugin..."
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+fi
+
+if [[ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" ]]; then
+    echo "Installing zsh-autosuggestions plugin..."
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 fi
 
 # Stow configurations (explicit list - easy to see and modify)
