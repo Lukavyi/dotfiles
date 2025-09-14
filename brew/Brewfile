@@ -1,4 +1,5 @@
 tap "sst/tap"
+brew "stow"
 brew "glibc"
 brew "gcc"
 brew "bat"
