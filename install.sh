@@ -8,6 +8,9 @@ BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Get the directory where this script is located
+DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Simple OS detection
 OS="unknown"
 [[ "$OSTYPE" == "darwin"* ]] && OS="macos"
@@ -30,11 +33,14 @@ fi
 echo -e "${BLUE}🏠 Setting up dotfiles for $OS...${NC}"
 [[ -n "$DISTRO" ]] && echo -e "${BLUE}  Linux distribution: $DISTRO${NC}"
 
-# Check we're in the right directory
-if [[ ! -f "install.sh" || ! -d "brew" ]]; then
-    echo -e "${RED}✗ Please run this script from the dotfiles directory${NC}"
+# Check we have the right directory structure
+if [[ ! -f "$DOTFILES_DIR/install.sh" || ! -d "$DOTFILES_DIR/brew" ]]; then
+    echo -e "${RED}✗ Dotfiles directory structure is incorrect${NC}"
     exit 1
 fi
+
+# Change to dotfiles directory for relative operations
+cd "$DOTFILES_DIR"
 
 # Install essential system packages on Linux (required for Homebrew)
 if [[ "$OS" == "linux" ]] && [[ -n "$DISTRO" ]]; then
@@ -223,10 +229,10 @@ if [[ -d "config/.config/nvim" ]]; then
 
     # Apply custom configurations (only the modified files)
     echo "Applying custom configurations..."
-    cp "config/.config/nvim/chadrc.lua" ~/.config/nvim/lua/chadrc.lua
-    cp "config/.config/nvim/mappings.lua" ~/.config/nvim/lua/mappings.lua
-    cp "config/.config/nvim/conform.lua" ~/.config/nvim/lua/configs/conform.lua
-    cp "config/.config/nvim/plugins.lua" ~/.config/nvim/lua/plugins/init.lua
+    cp "$DOTFILES_DIR/config/.config/nvim/chadrc.lua" ~/.config/nvim/lua/chadrc.lua
+    cp "$DOTFILES_DIR/config/.config/nvim/mappings.lua" ~/.config/nvim/lua/mappings.lua
+    cp "$DOTFILES_DIR/config/.config/nvim/conform.lua" ~/.config/nvim/lua/configs/conform.lua
+    cp "$DOTFILES_DIR/config/.config/nvim/plugins.lua" ~/.config/nvim/lua/plugins/init.lua
 
     echo -e "${GREEN}✓ NvChad installed with custom configuration${NC}"
     echo -e "${YELLOW}  Run 'nvim' and wait for plugins to install on first launch${NC}"
