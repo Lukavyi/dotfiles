@@ -79,12 +79,21 @@ if ! command -v brew &>/dev/null; then
     echo -e "${GREEN}✓ Homebrew installed and added to PATH${NC}"
 fi
 
-# Install all packages from Brewfile (including stow)
-if [[ -f "brew/Brewfile" ]]; then
-    echo "Installing Homebrew packages..."
-    brew bundle --file=brew/Brewfile || {
-        echo -e "${YELLOW}⚠ Some packages may have failed (normal on Linux for GUI apps)${NC}"
+# Install packages from appropriate Brewfile based on OS
+if [[ "$OS" == "macos" ]] && [[ -f "brew/Brewfile.macos" ]]; then
+    echo "Installing Homebrew packages for macOS..."
+    brew bundle --file=brew/Brewfile.macos || {
+        echo -e "${YELLOW}⚠ Some packages may have failed to install${NC}"
     }
+elif [[ "$OS" == "linux" ]] && [[ -f "brew/Brewfile.cli" ]]; then
+    echo "Installing Homebrew packages for Linux/CLI..."
+    brew bundle --file=brew/Brewfile.cli || {
+        echo -e "${YELLOW}⚠ Some packages may have failed to install${NC}"
+    }
+else
+    echo -e "${RED}✗ No appropriate Brewfile found for $OS${NC}"
+    echo "  Expected: brew/Brewfile.macos (macOS) or brew/Brewfile.cli (Linux)"
+    exit 1
 fi
 
 # Install Oh My Zsh if not already installed
@@ -110,6 +119,72 @@ fi
 if [[ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" ]]; then
     echo "Installing zsh-autosuggestions plugin..."
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+fi
+
+# Check and backup existing dotfiles that might conflict with stow
+echo "Checking for existing dotfiles..."
+BACKUP_NEEDED=false
+BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
+
+# List of files that stow will try to create
+DOTFILES_TO_CHECK=(
+    ".zshrc" ".zprofile"           # from zsh/
+    ".gitconfig" ".gitignore"      # from git/
+    ".tmux.conf"                    # from tmux/
+    ".p10k.zsh"                     # from p10k/
+)
+
+# Also check .config subdirectories
+CONFIG_DIRS_TO_CHECK=(
+    ".config/bat"
+    ".config/gh"
+    ".config/htop"
+    ".config/nvim"
+    ".config/thefuck"
+)
+
+# Check if any regular files exist and aren't already symlinks
+for file in "${DOTFILES_TO_CHECK[@]}"; do
+    if [[ -e "$HOME/$file" ]] && [[ ! -L "$HOME/$file" ]]; then
+        BACKUP_NEEDED=true
+        break
+    fi
+done
+
+# Check if any .config directories exist and aren't symlinks
+for dir in "${CONFIG_DIRS_TO_CHECK[@]}"; do
+    if [[ -e "$HOME/$dir" ]] && [[ ! -L "$HOME/$dir" ]]; then
+        BACKUP_NEEDED=true
+        break
+    fi
+done
+
+if [[ "$BACKUP_NEEDED" == true ]]; then
+    echo -e "${YELLOW}⚠ Found existing dotfiles that would conflict with stow${NC}"
+    echo "  Creating backup in: $BACKUP_DIR"
+    mkdir -p "$BACKUP_DIR"
+
+    # Backup regular dotfiles
+    for file in "${DOTFILES_TO_CHECK[@]}"; do
+        if [[ -e "$HOME/$file" ]] && [[ ! -L "$HOME/$file" ]]; then
+            echo "  Backing up: $file"
+            mv "$HOME/$file" "$BACKUP_DIR/"
+        fi
+    done
+
+    # Backup .config directories
+    mkdir -p "$BACKUP_DIR/.config"
+    for dir in "${CONFIG_DIRS_TO_CHECK[@]}"; do
+        if [[ -e "$HOME/$dir" ]] && [[ ! -L "$HOME/$dir" ]]; then
+            dir_name=$(basename "$dir")
+            echo "  Backing up: $dir"
+            mv "$HOME/$dir" "$BACKUP_DIR/.config/$dir_name"
+        fi
+    done
+
+    echo -e "${GREEN}✓ Existing dotfiles backed up and removed${NC}"
+    echo "  Backup location: $BACKUP_DIR"
+    echo ""
 fi
 
 # Stow configurations (explicit list - easy to see and modify)

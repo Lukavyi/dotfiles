@@ -24,13 +24,19 @@ DRY_RUN=false
 
 echo -e "${BLUE}Backing up configurations...${NC}"
 
-# Backup Homebrew packages
+# Backup Homebrew packages to appropriate Brewfile based on OS
 if command -v brew &>/dev/null; then
-    if [[ "$DRY_RUN" == true ]]; then
-        echo "  [DRY-RUN] Would update brew/Brewfile"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        BREWFILE="brew/Brewfile.macos"
     else
-        brew bundle dump --file=brew/Brewfile --force
-        echo -e "${GREEN}✓${NC} Homebrew packages backed up"
+        BREWFILE="brew/Brewfile.cli"
+    fi
+
+    if [[ "$DRY_RUN" == true ]]; then
+        echo "  [DRY-RUN] Would update $BREWFILE"
+    else
+        brew bundle dump --file=$BREWFILE --force
+        echo -e "${GREEN}✓${NC} Homebrew packages backed up to $BREWFILE"
     fi
 fi
 

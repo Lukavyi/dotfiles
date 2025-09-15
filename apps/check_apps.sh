@@ -186,7 +186,7 @@ done
 
 echo -e "\n======================================================"
 echo "Installation instructions:"
-echo "1. Run: brew bundle --file=brew/Brewfile"
+echo "1. Run: brew bundle --file=brew/Brewfile.macos"
 echo "2. Manually install apps marked with ✗ from the manual section"
 echo "3. Sign in to Mac App Store and install missing apps"
 echo "4. Run this script again to update the inventory"

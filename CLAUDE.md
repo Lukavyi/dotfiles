@@ -16,7 +16,8 @@ This is a minimal personal dotfiles repository managed with GNU Stow for macOS a
 ./install.sh
 
 # Manual installation
-brew bundle --file=brew/Brewfile  # Install all packages (including stow)
+brew bundle --file=brew/Brewfile.macos  # macOS: Install all packages
+brew bundle --file=brew/Brewfile.cli    # Linux/CLI: Install CLI tools only
 stow zsh git tmux p10k config     # Link configurations
 cd npm && npm install -g && cd .. # Install npm packages
 cd claude && bash install.sh      # Install Claude config
@@ -55,7 +56,7 @@ stow -D zsh git tmux p10k config
   - Checks macOS apps on macOS
 
 - **`backup.sh`** (66 lines) - Minimal backup that:
-  - Updates Brewfile with current packages
+  - Updates Brewfile.macos or Brewfile.cli based on OS
   - Backs up local zsh config
   - Updates apps inventory on macOS
   - Supports --dry-run to preview changes
@@ -80,7 +81,7 @@ The repository was drastically simplified by removing:
 ## Directory Structure
 
 - **`apps/`** - macOS application tracking
-- **`brew/`** - Brewfile with all packages (includes stow now)
+- **`brew/`** - Brewfile.cli (CLI tools) and Brewfile.macos (includes CLI + GUI)
 - **`claude/`** - Claude Code CLI configuration
 - **`config/`** - .config/ subdirectories (bat, gh, nvim, etc.)
 - **`git/`** - Git configuration
@@ -106,7 +107,7 @@ The repository was drastically simplified by removing:
 
 ### Add a new Homebrew package
 1. Run `brew install <package>`
-2. Run `./backup.sh` to update Brewfile
+2. Run `./backup.sh` to update Brewfile.macos or Brewfile.cli
 3. Commit the changes
 
 ### Check what's installed on macOS

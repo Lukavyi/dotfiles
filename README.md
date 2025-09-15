@@ -30,7 +30,7 @@ cd ~/dotfiles
 
 The installer will:
 - Install Homebrew (if needed)
-- Install all packages from Brewfile (including stow)
+- Install packages from OS-specific Brewfile (Brewfile.macos or Brewfile.cli)
 - Link configurations with stow
 - Set up special installers (npm, claude)
 - Check macOS apps (on macOS only)
@@ -43,8 +43,9 @@ If you prefer to see each step:
 # Install Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Install all packages (including stow)
-brew bundle --file=brew/Brewfile
+# Install packages (including stow)
+brew bundle --file=brew/Brewfile.macos  # macOS
+brew bundle --file=brew/Brewfile.cli    # Linux/CLI
 
 # Link configurations
 stow zsh git tmux p10k config
@@ -69,7 +70,7 @@ The installer creates template files for machine-specific settings:
 ### Backup Your Configurations
 
 ```bash
-# Quick backup (updates Brewfile and apps inventory)
+# Quick backup (updates OS-specific Brewfile and apps inventory)
 ./backup.sh
 
 # See what would be backed up without making changes
@@ -77,7 +78,7 @@ The installer creates template files for machine-specific settings:
 ```
 
 This backs up:
-- Homebrew packages → `brew/Brewfile`
+- Homebrew packages → `brew/Brewfile.macos` or `brew/Brewfile.cli`
 - Local zsh config → `zsh/.zshrc.local.example`
 - macOS apps inventory → `apps/apps.yml` (macOS only)
 
@@ -102,7 +103,7 @@ stow -D config
 ## Structure
 
 - `apps/` - Application inventory and installation tracking (macOS)
-- `brew/` - Homebrew packages (Brewfile) - cross-platform CLI tools, macOS GUI apps
+- `brew/` - Homebrew packages (Brewfile.cli for CLI tools, Brewfile.macos for macOS with GUI apps)
 - `claude/` - Claude Code CLI configuration (MCP servers)
 - `config/` - Miscellaneous .config subdirectories (bat, gh, htop, thefuck, nvim)
 - `git/` - Git configuration with `.gitconfig.local.example` template
@@ -134,13 +135,13 @@ stow -D config
 ### `install.sh` (85 lines)
 Sets up everything from scratch:
 - Installs Homebrew
-- Installs all packages from Brewfile
+- Installs packages from OS-specific Brewfile
 - Links configurations with stow
 - Runs special installers
 
 ### `backup.sh` (66 lines)
 Backs up current machine state:
-- Updates Brewfile with installed packages
+- Updates OS-specific Brewfile with installed packages
 - Saves local configurations
 - Updates apps inventory (macOS)
 
@@ -170,7 +171,7 @@ This used to be ~1,500 lines of bash with dynamic discovery, hooks, and complex 
 
 The scripts do exactly what you need:
 1. Install your tools and link your configs
-2. Backup Brewfile when you install new tools
+2. Backup OS-specific Brewfile when you install new tools
 3. Track macOS apps (if on macOS)
 
 That's it. No framework, no magic, just straightforward bash that works.
