@@ -69,3 +69,6 @@ zsh/.zprofile.local
 
 # Neovim generated files
 config/.config/nvim/lazy-lock.json
+
+# Tmux Plugin Manager
+.tmux/plugins/

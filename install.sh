@@ -232,6 +232,27 @@ if [[ -d "config/.config/nvim" ]]; then
     echo -e "${YELLOW}  Run 'nvim' and wait for plugins to install on first launch${NC}"
 fi
 
+# Install TPM (Tmux Plugin Manager) if not already installed
+if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+    echo -e "${BLUE}Installing Tmux Plugin Manager (TPM)...${NC}"
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    echo -e "${GREEN}✓ TPM installed${NC}"
+
+    # Install tmux plugins automatically
+    echo "Installing tmux plugins..."
+    if "$HOME/.tmux/plugins/tpm/bin/install_plugins" 2>/dev/null; then
+        echo -e "${GREEN}✓ Tmux plugins installed${NC}"
+    else
+        echo -e "${YELLOW}⚠ Tmux plugins installation may have failed. Run prefix+I in tmux to install manually.${NC}"
+    fi
+else
+    # Update existing plugins
+    echo "Updating tmux plugins..."
+    if "$HOME/.tmux/plugins/tpm/bin/update_plugins" all 2>/dev/null; then
+        echo -e "${GREEN}✓ Tmux plugins updated${NC}"
+    fi
+fi
+
 # Run special installers if they exist
 if [[ -f "claude/install.sh" ]]; then
     echo "Installing Claude configuration..."
