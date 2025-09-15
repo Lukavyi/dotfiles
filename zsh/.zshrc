@@ -301,8 +301,3 @@ testtruecolors() {
 # .zshrc.$(hostname -s) can be used for configs specific to a hostname
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 [[ -f ~/.zshrc.$(hostname -s) ]] && source ~/.zshrc.$(hostname -s)
-
-# ============================================================================
-# Welcome Message
-# ============================================================================
-echo "✅ Shell ready ($(tput colors) colors)"
