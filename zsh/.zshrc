@@ -183,7 +183,7 @@ source $ZSH/oh-my-zsh.sh
 # Development shortcuts
 alias c="claude"
 alias oc="opencode"
-alias cs="cs"
+alias cs="claude-squad"
 
 # Editor aliases
 alias vim="nvim"                                       # Use neovim instead of vim (from Synology-Homebrew)
