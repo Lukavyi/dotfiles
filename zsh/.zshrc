@@ -190,8 +190,8 @@ alias vim="nvim"                                       # Use neovim instead of v
 alias vi="nvim"                                        # Use neovim instead of vi (from Synology-Homebrew)
 
 # Modern CLI tool aliases
-alias ll="eza -la --icons --octal-permissions --group-directories-first"
-alias ls="eza --icons --group-directories-first"       # Modern ls replacement (from Synology-Homebrew)
+alias ll="eza -la --icons --octal-permissions --group-directories-first" # Better directory listing (from Synology-Homebrew)
+alias ls="eza --color=always --group-directories-first --icons"          # Modern ls replacement (from Synology-Homebrew)
 alias l="eza -l --icons --group-directories-first"     # Long format listing (from Synology-Homebrew)
 alias la="eza -a --icons --group-directories-first"    # Show hidden files (from Synology-Homebrew)
 alias tree="eza --tree --icons"                        # Tree view with icons (from Synology-Homebrew)
