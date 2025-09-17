@@ -1,2 +1,8 @@
-[gpg "ssh"]
-	program = op-ssh-sign
+# Disable commit signing on Linux when 1Password is not available
+# Comment out these lines if you have 1Password CLI installed on Linux
+# [gpg "ssh"]
+#  program = op-ssh-sign
+
+# Override commit signing for Linux without 1Password
+[commit]
+  gpgsign = false
