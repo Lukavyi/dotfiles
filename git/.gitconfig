@@ -5,10 +5,10 @@
 	helper =
 	helper = !gh auth git-credential
 [gpg]
-	format = ssh
-[includeIf "gitdir/i:**"]
-	path = ~/.gitconfig.platform
-[commit]
-	gpgsign = true
+  format = ssh
+[includeIf "env:GIT_PLATFORM=macos"]
+  path = ~/.gitconfig.macos
+[includeIf "env:GIT_PLATFORM=linux"]
+  path = ~/.gitconfig.linux
 [include]
-	path = ~/.gitconfig.local
+  path = ~/.gitconfig.local

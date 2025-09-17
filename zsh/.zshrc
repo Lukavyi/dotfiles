@@ -247,6 +247,34 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 # ============================================================================
+# Git Platform Auto-Detect
+# ============================================================================
+# Визначає ОС та встановлює змінну GIT_PLATFORM, щоб Git підтягував
+# відповідний ~/.gitconfig.<platform>. Якщо платформа не розпізнана —
+# змінна не задається й підпис комітів буде вимкнено.
+# ============================================================================
+
+case "$(uname -s)" in
+  Darwin)
+    export GIT_PLATFORM="macos"   # macOS + 1Password-SSH-agent
+    ;;
+  Linux)
+    # WSL визначаємо окремо
+    if grep -qiE "microsoft|wsl" /proc/version 2>/dev/null; then
+      export GIT_PLATFORM="wsl"
+    else
+      export GIT_PLATFORM="linux"
+    fi
+    ;;
+  *)
+    unset GIT_PLATFORM            # невідома ОС → підпис вимкнено
+    ;;
+esac
+
+# (Необовʼязково) показує підказку, якщо підписування відключене.
+[[ -z "${GIT_PLATFORM}" ]] && echo "%F{yellow}[git signing disabled: unknown platform]%f"
+
+# ============================================================================
 # Additional Tool Initialization
 # ============================================================================
 
