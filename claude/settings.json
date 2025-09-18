@@ -7,6 +7,10 @@
   "feedbackSurveyState": {
     "lastShownTime": 1754086586293
   },
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y @owloops/claude-powerline@latest --style=powerline"
+  },
   "mcpServers": {
     "zen": {
       "command": "uv",
