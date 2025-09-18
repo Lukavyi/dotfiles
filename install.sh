@@ -265,9 +265,9 @@ if [[ -f "claude/install.sh" ]]; then
     (cd claude && bash install.sh)
 fi
 
-if [[ -f "npm/package.json" ]]; then
+if [[ -f "npm/install.sh" ]]; then
     echo "Installing global npm packages..."
-    (cd npm && npm install -g)
+    bash npm/install.sh
 fi
 
 # Platform-specific: Check macOS applications
