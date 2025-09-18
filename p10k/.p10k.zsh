@@ -1810,41 +1810,78 @@
   # typeset -g POWERLEVEL9K_EXAMPLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   # Claude Code usage segment - shows current session info from ccusage
+  # Cache variables for claude segment
+  typeset -g _CLAUDE_CACHE_TIME=0
+  typeset -g _CLAUDE_CACHE_DATA=""
+
   function prompt_claude() {
     # Only run if ccusage and jq are available
     if command -v ccusage &>/dev/null && command -v jq &>/dev/null; then
-      local today=$(date +%Y-%m-%d)
-      local month=$(date +%Y-%m)
+      local current_time=$(date +%s)
+      local cache_age=$((current_time - _CLAUDE_CACHE_TIME))
 
-      # Get today's and monthly data in one go
-      local data=$(ccusage daily --json 2>/dev/null | jq --arg today "$today" -r '
-        .daily[] | select(.date == $today) | "\(.totalTokens) \(.totalCost)"' 2>/dev/null)
-      local monthly=$(ccusage monthly --json 2>/dev/null | jq --arg month "$month" -r '
-        .monthly[] | select(.month == $month) | "\(.totalTokens) \(.totalCost)"' 2>/dev/null)
+      # Use cache if less than 60 seconds old
+      if [[ $cache_age -lt 60 && -n "$_CLAUDE_CACHE_DATA" ]]; then
+        p10k segment -f 117 -b 236 -i '🤖' -t "$_CLAUDE_CACHE_DATA"
+        return
+      fi
 
-      if [[ -n "$data" && -n "$monthly" ]]; then
-        local tokens=$(echo "$data" | awk '{print $1}')
-        local cost=$(echo "$data" | awk '{print $2}')
-        local month_tokens=$(echo "$monthly" | awk '{print $1}')
-        local month_cost=$(echo "$monthly" | awk '{print $2}')
+      # Check if we're already fetching (prevent multiple simultaneous fetches)
+      if [[ $_CLAUDE_CACHE_TIME == -1 ]]; then
+        # Show cached data or nothing while fetching
+        [[ -n "$_CLAUDE_CACHE_DATA" ]] && p10k segment -f 117 -b 236 -i '🤖' -t "$_CLAUDE_CACHE_DATA"
+        return
+      fi
 
-        # Format tokens with K/M/B suffix
-        local fmt_tokens=$(echo "$tokens" | awk '{
-          if ($1 >= 1e9) printf "%.1fB", $1/1e9
-          else if ($1 >= 1e6) printf "%.1fM", $1/1e6
-          else if ($1 >= 1e3) printf "%.1fK", $1/1e3
-          else print $1
-        }')
+      # Mark as fetching
+      _CLAUDE_CACHE_TIME=-1
 
-        local fmt_month_tokens=$(echo "$month_tokens" | awk '{
-          if ($1 >= 1e9) printf "%.1fB", $1/1e9
-          else if ($1 >= 1e6) printf "%.1fM", $1/1e6
-          else if ($1 >= 1e3) printf "%.1fK", $1/1e3
-          else print $1
-        }')
+      # Fetch in background (disown to avoid job control messages)
+      {
+        local today=$(date +%Y-%m-%d)
+        local month=$(date +%Y-%m)
 
-        # Display: today: tokens/$, month: tokens/$
-        p10k segment -f 117 -b 236 -i '🤖' -t "today: ${fmt_tokens}/\$$(printf "%.0f" $cost), month: ${fmt_month_tokens}/\$$(printf "%.0f" $month_cost)"
+        # Get today's and monthly data in one go
+        local data=$(ccusage daily --json 2>/dev/null | jq --arg today "$today" -r '
+          .daily[] | select(.date == $today) | "\(.totalTokens) \(.totalCost)"' 2>/dev/null)
+        local monthly=$(ccusage monthly --json 2>/dev/null | jq --arg month "$month" -r '
+          .monthly[] | select(.month == $month) | "\(.totalTokens) \(.totalCost)"' 2>/dev/null)
+
+        if [[ -n "$data" && -n "$monthly" ]]; then
+          local tokens=$(echo "$data" | awk '{print $1}')
+          local cost=$(echo "$data" | awk '{print $2}')
+          local month_tokens=$(echo "$monthly" | awk '{print $1}')
+          local month_cost=$(echo "$monthly" | awk '{print $2}')
+
+          # Format tokens with K/M/B suffix
+          local fmt_tokens=$(echo "$tokens" | awk '{
+            if ($1 >= 1e9) printf "%.1fB", $1/1e9
+            else if ($1 >= 1e6) printf "%.1fM", $1/1e6
+            else if ($1 >= 1e3) printf "%.1fK", $1/1e3
+            else print $1
+          }')
+
+          local fmt_month_tokens=$(echo "$month_tokens" | awk '{
+            if ($1 >= 1e9) printf "%.1fB", $1/1e9
+            else if ($1 >= 1e6) printf "%.1fM", $1/1e6
+            else if ($1 >= 1e3) printf "%.1fK", $1/1e3
+            else print $1
+          }')
+
+          # Save to temp file for parent shell to read
+          echo "$(date +%s)" > /tmp/.claude_cache_time_$$
+          echo "today: ${fmt_tokens}/\$$(printf "%.0f" $cost), month: ${fmt_month_tokens}/\$$(printf "%.0f" $month_cost)" > /tmp/.claude_cache_data_$$
+        fi
+      } &>/dev/null &!
+
+      # Show previous cached data while updating
+      [[ -n "$_CLAUDE_CACHE_DATA" ]] && p10k segment -f 117 -b 236 -i '🤖' -t "$_CLAUDE_CACHE_DATA"
+
+      # Read from temp files if they exist (from previous background job)
+      if [[ -f /tmp/.claude_cache_time_$$ && -f /tmp/.claude_cache_data_$$ ]]; then
+        _CLAUDE_CACHE_TIME=$(cat /tmp/.claude_cache_time_$$ 2>/dev/null || echo 0)
+        _CLAUDE_CACHE_DATA=$(cat /tmp/.claude_cache_data_$$ 2>/dev/null || echo "")
+        rm -f /tmp/.claude_cache_time_$$ /tmp/.claude_cache_data_$$ 2>/dev/null
       fi
     fi
   }
