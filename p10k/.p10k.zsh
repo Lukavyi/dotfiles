@@ -1813,11 +1813,22 @@
   # Cache variables for claude segment
   typeset -g _CLAUDE_CACHE_TIME=0
   typeset -g _CLAUDE_CACHE_DATA=""
+  typeset -g _CLAUDE_CACHE_FILE="/tmp/.claude_cache_${USER:-unknown}"
 
   function prompt_claude() {
     # Only run if ccusage and jq are available
     if command -v ccusage &>/dev/null && command -v jq &>/dev/null; then
       local current_time=$(date +%s)
+
+      # Try to load persistent cache if our memory cache is empty
+      if [[ -z "$_CLAUDE_CACHE_DATA" && -f "$_CLAUDE_CACHE_FILE" ]]; then
+        local cache_content=$(cat "$_CLAUDE_CACHE_FILE" 2>/dev/null)
+        if [[ -n "$cache_content" ]]; then
+          _CLAUDE_CACHE_TIME=$(echo "$cache_content" | head -1)
+          _CLAUDE_CACHE_DATA=$(echo "$cache_content" | tail -1)
+        fi
+      fi
+
       local cache_age=$((current_time - _CLAUDE_CACHE_TIME))
 
       # Use cache if less than 60 seconds old
@@ -1868,21 +1879,26 @@
             else print $1
           }')
 
-          # Save to temp file for parent shell to read
-          echo "$(date +%s)" > /tmp/.claude_cache_time_$$
-          echo "today: ${fmt_tokens}/\$$(printf "%.0f" $cost), month: ${fmt_month_tokens}/\$$(printf "%.0f" $month_cost)" > /tmp/.claude_cache_data_$$
+          # Save to persistent cache file (user-specific, not PID-specific)
+          local display_text="today: ${fmt_tokens}/\$$(printf "%.0f" $cost), month: ${fmt_month_tokens}/\$$(printf "%.0f" $month_cost)"
+          echo -e "$(date +%s)\n$display_text" > "$_CLAUDE_CACHE_FILE.tmp"
+          mv "$_CLAUDE_CACHE_FILE.tmp" "$_CLAUDE_CACHE_FILE" 2>/dev/null
         fi
       } &>/dev/null &!
 
       # Show previous cached data while updating
       [[ -n "$_CLAUDE_CACHE_DATA" ]] && p10k segment -f 117 -b 236 -i '🤖' -t "$_CLAUDE_CACHE_DATA"
 
-      # Read from temp files if they exist (from previous background job)
-      if [[ -f /tmp/.claude_cache_time_$$ && -f /tmp/.claude_cache_data_$$ ]]; then
-        _CLAUDE_CACHE_TIME=$(cat /tmp/.claude_cache_time_$$ 2>/dev/null || echo 0)
-        _CLAUDE_CACHE_DATA=$(cat /tmp/.claude_cache_data_$$ 2>/dev/null || echo "")
-        rm -f /tmp/.claude_cache_time_$$ /tmp/.claude_cache_data_$$ 2>/dev/null
-      fi
+      # Read from cache file after a short delay to allow background job to complete
+      ( sleep 0.5 && {
+        if [[ -f "$_CLAUDE_CACHE_FILE" ]]; then
+          local cache_content=$(cat "$_CLAUDE_CACHE_FILE" 2>/dev/null)
+          if [[ -n "$cache_content" ]]; then
+            _CLAUDE_CACHE_TIME=$(echo "$cache_content" | head -1)
+            _CLAUDE_CACHE_DATA=$(echo "$cache_content" | tail -1)
+          fi
+        fi
+      } ) &>/dev/null &!
     fi
   }
 
