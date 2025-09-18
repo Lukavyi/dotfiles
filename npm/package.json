@@ -11,7 +11,7 @@
     "yarn": "^1.22.22"
   },
   "scripts": {
-    "install-global": "npm install -g @anthropic-ai/claude-code @openai/codex opencode-ai ccusage corepack yarn",
+    "install-global": "npm install -g $(jq -r '.dependencies | keys[]' package.json) --force",
     "list-global": "npm list -g --depth=0"
   }
 }

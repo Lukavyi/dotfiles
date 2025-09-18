@@ -27,7 +27,7 @@ if ! command -v npm &>/dev/null; then
 fi
 
 # Install packages globally
-if npm install -g; then
+if npm run install-global; then
     echo -e "${GREEN}✓ Global npm packages installed successfully!${NC}"
     echo -e "${BLUE}Run 'npm list -g --depth=0' to see installed packages${NC}"
 else
