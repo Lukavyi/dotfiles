@@ -48,6 +48,7 @@
   # last prompt line gets hidden if it would overlap with left prompt.
   typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
     # =========================[ Line #1 ]=========================
+    claude                  # Claude Code usage info (from ccusage)
     status                  # exit code of the last command
     command_execution_time  # duration of the last command
     background_jobs         # presence of background jobs
@@ -87,7 +88,7 @@
     gcloud                  # google cloud cli account and project (https://cloud.google.com/)
     google_app_cred         # google application credentials (https://cloud.google.com/docs/authentication/production)
     toolbox                 # toolbox name (https://github.com/containers/toolbox)
-    context                 # user@hostname
+    # context                 # user@hostname
     nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
     ranger                  # ranger shell (https://github.com/ranger/ranger)
     yazi                    # yazi shell (https://github.com/sxyazi/yazi)
@@ -109,7 +110,7 @@
     taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
     per_directory_history   # Oh My Zsh per-directory-history local/global indicator
     # cpu_arch              # CPU architecture
-    time                    # current time
+    # time                  # current time (commented out to remove from display)
     # =========================[ Line #2 ]=========================
     newline
     # ip                    # ip address and bandwidth usage for a specified network interface
@@ -1807,6 +1808,51 @@
   typeset -g POWERLEVEL9K_EXAMPLE_FOREGROUND=3
   typeset -g POWERLEVEL9K_EXAMPLE_BACKGROUND=1
   # typeset -g POWERLEVEL9K_EXAMPLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Claude Code usage segment - shows current session info from ccusage
+  function prompt_claude() {
+    # Only run if ccusage and jq are available
+    if command -v ccusage &>/dev/null && command -v jq &>/dev/null; then
+      local today=$(date +%Y-%m-%d)
+      local month=$(date +%Y-%m)
+
+      # Get today's and monthly data in one go
+      local data=$(ccusage daily --json 2>/dev/null | jq --arg today "$today" -r '
+        .daily[] | select(.date == $today) | "\(.totalTokens) \(.totalCost)"' 2>/dev/null)
+      local monthly=$(ccusage monthly --json 2>/dev/null | jq --arg month "$month" -r '
+        .monthly[] | select(.month == $month) | "\(.totalTokens) \(.totalCost)"' 2>/dev/null)
+
+      if [[ -n "$data" && -n "$monthly" ]]; then
+        local tokens=$(echo "$data" | awk '{print $1}')
+        local cost=$(echo "$data" | awk '{print $2}')
+        local month_tokens=$(echo "$monthly" | awk '{print $1}')
+        local month_cost=$(echo "$monthly" | awk '{print $2}')
+
+        # Format tokens with K/M/B suffix
+        local fmt_tokens=$(echo "$tokens" | awk '{
+          if ($1 >= 1e9) printf "%.1fB", $1/1e9
+          else if ($1 >= 1e6) printf "%.1fM", $1/1e6
+          else if ($1 >= 1e3) printf "%.1fK", $1/1e3
+          else print $1
+        }')
+
+        local fmt_month_tokens=$(echo "$month_tokens" | awk '{
+          if ($1 >= 1e9) printf "%.1fB", $1/1e9
+          else if ($1 >= 1e6) printf "%.1fM", $1/1e6
+          else if ($1 >= 1e3) printf "%.1fK", $1/1e3
+          else print $1
+        }')
+
+        # Display: today: tokens/$, month: tokens/$
+        p10k segment -f 117 -b 236 -i '🤖' -t "today: ${fmt_tokens}/\$$(printf "%.0f" $cost), month: ${fmt_month_tokens}/\$$(printf "%.0f" $month_cost)"
+      fi
+    fi
+  }
+
+  # Claude segment customization
+  typeset -g POWERLEVEL9K_CLAUDE_FOREGROUND=117
+  typeset -g POWERLEVEL9K_CLAUDE_BACKGROUND=236
+  # typeset -g POWERLEVEL9K_CLAUDE_VISUAL_IDENTIFIER_EXPANSION='🤖'
 
   # Transient prompt works similarly to the builtin transient_rprompt option. It trims down prompt
   # when accepting a command line. Supported values:
