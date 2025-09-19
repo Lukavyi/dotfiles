@@ -275,6 +275,35 @@ esac
 [[ -z "${GIT_PLATFORM}" ]] && echo "%F{yellow}[git signing disabled: unknown platform]%f"
 
 # ============================================================================
+# Git Auto-Fetch Configuration
+# ============================================================================
+# Automatically fetch git repositories in the background when entering them
+# This keeps the local repository aware of remote changes for accurate prompt display
+
+function git_auto_fetch() {
+  if [[ -d .git ]]; then
+    local fetch_marker=".git/LAST_AUTO_FETCH"
+    local current_time=$(date +%s)
+    local last_fetch=0
+
+    [[ -f $fetch_marker ]] && last_fetch=$(<$fetch_marker)
+
+    # Only fetch if 5+ minutes have passed
+    if (( current_time - last_fetch > 300 )); then
+      (git fetch --all &>/dev/null &)
+      echo $current_time > $fetch_marker
+    fi
+  fi
+}
+
+# Run on directory change
+autoload -U add-zsh-hook
+add-zsh-hook chpwd git_auto_fetch
+
+# Run on new shell in git repo
+git_auto_fetch
+
+# ============================================================================
 # Additional Tool Initialization
 # ============================================================================
 
