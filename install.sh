@@ -233,6 +233,7 @@ if [[ -d "config/.config/nvim" ]]; then
     echo "Applying custom configurations..."
     cp "$DOTFILES_DIR/config/.config/nvim/chadrc.lua" ~/.config/nvim/lua/chadrc.lua
     cp "$DOTFILES_DIR/config/.config/nvim/mappings.lua" ~/.config/nvim/lua/mappings.lua
+    cp "$DOTFILES_DIR/config/.config/nvim/options.lua" ~/.config/nvim/lua/options.lua
     cp "$DOTFILES_DIR/config/.config/nvim/conform.lua" ~/.config/nvim/lua/configs/conform.lua
     cp "$DOTFILES_DIR/config/.config/nvim/plugins.lua" ~/.config/nvim/lua/plugins/init.lua
 
