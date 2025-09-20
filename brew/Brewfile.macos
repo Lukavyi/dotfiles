@@ -3,6 +3,7 @@ instance_eval(File.read(File.join(__dir__, "Brewfile.cli")))
 
 # macOS-specific CLI tools
 brew "ffmpeg"
+brew "libusb"
 brew "mas"
 
 # GUI applications (Casks)
@@ -28,21 +29,31 @@ cask "zoom"
 # Mac App Store applications
 mas "1Password for Safari", id: 1569813296
 mas "Accelerate", id: 1459809092
+mas "Actions", id: 1586435171
 mas "Amphetamine", id: 937984704
 mas "Blackmagic Disk Speed Test", id: 425264550
 mas "Craft", id: 1487937127
 mas "Craft Web Clipper", id: 6748613311
+mas "Data Jar", id: 1453273600
+mas "Dropover", id: 1355679052
 mas "Fantastical", id: 975937182
 mas "Flighty", id: 1358823008
+mas "Folder Preview", id: 6698876601
+mas "Frame.io", id: 992958444
+mas "Framous", id: 6636520519
 mas "Keynote", id: 409183694
+mas "Kindle", id: 302584613
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Photomator", id: 1444636541
 mas "Pixelmator Pro", id: 1289583905
+mas "Save to Reader", id: 1640236961
 mas "Screens 5", id: 1663047912
 mas "Slack", id: 803453959
 mas "Tailscale", id: 1475387142
 mas "Telegram", id: 747648890
+mas "Teleprompter", id: 1533078079
 mas "TestFlight", id: 899247664
 mas "The Unarchiver", id: 425424353
 mas "Timery", id: 1425368544
+mas "Xcode", id: 497799835

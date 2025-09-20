@@ -1,10 +1,13 @@
 #!/bin/bash
 
-# Auto-generate apps.yml from Applications folder and check installation status
-# This script scans /Applications/, categorizes apps by source, and shows what's missing
+# Auto-generate apps.yml with only manually installed applications
+# This script scans /Applications/ and excludes apps managed by brew/cask/mas
 
-echo "Generating application inventory and checking status..."
-echo "======================================================"
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+echo "Scanning for manually installed applications..."
+echo "====================================================="
 
 # Colors for output
 RED='\033[0;31m'
@@ -19,42 +22,35 @@ if ! command -v yq &> /dev/null; then
     exit 1
 fi
 
-echo -e "${BLUE}Scanning /Applications/ and categorizing by installation source...${NC}"
+echo -e "${BLUE}Scanning /Applications/ for apps not managed by brew or mas...${NC}"
 
-# Get lists of apps by source
+# Get lists of apps managed by package managers (to exclude them)
 homebrew_casks=$(brew list --cask 2>/dev/null | sort)
 appstore_apps=$(mas list 2>/dev/null | awk '{$1=""; print $0}' | sed 's/^ //' | sort)
 
-# Initialize arrays
-declare -a homebrew_list
-declare -a appstore_list  
+# Initialize array for manual apps only
 declare -a manual_list
 
-# First, add all Homebrew casks (including CLI tools that don't appear in /Applications/)
-while IFS= read -r cask; do
-    if [ -n "$cask" ]; then
-        homebrew_list+=("$cask")
-    fi
-done <<< "$homebrew_casks"
-
-# Scan Applications folder for apps not already tracked by Homebrew
+# Scan Applications folder for apps not managed by brew or mas
 for app_path in /Applications/*.app; do
     if [ -d "$app_path" ] || [ -L "$app_path" ]; then
         app_name=$(basename "$app_path" .app)
-        
-        # Check if this app is installed via Homebrew cask by trying name transformations
+
+        # Check if this app is installed via Homebrew cask
         cask_found=false
-        
-        # Special case: 1Password GUI app should not be confused with 1password-cli
+
+        # Special case: 1Password GUI app (handled by 1password cask)
         if [[ "$app_name" == "1Password" ]]; then
-            cask_found=false
+            if echo "$homebrew_casks" | grep -q "^1password$"; then
+                cask_found=true
+            fi
         else
             # Try exact match first (lowercase, spaces to hyphens)
             cask_name=$(echo "$app_name" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
             if echo "$homebrew_casks" | grep -q "^${cask_name}$"; then
                 cask_found=true
             fi
-            
+
             # Try with "desktop" suffix for some apps
             if [ "$cask_found" = false ] && [[ "$app_name" == "Docker" ]]; then
                 if echo "$homebrew_casks" | grep -q "^docker-desktop$"; then
@@ -62,31 +58,27 @@ for app_path in /Applications/*.app; do
                 fi
             fi
         fi
-        
-        # Skip if already tracked by Homebrew
+
+        # Skip if managed by Homebrew
         if [ "$cask_found" = true ]; then
             continue
         fi
-        
-        # Check if it's from App Store (exact app name match)
+
+        # Check if it's from App Store
         appstore_match=$(echo "$appstore_apps" | grep "^${app_name} " | head -1)
         if [[ -n "$appstore_match" ]]; then
-            # Verify it's an exact match (not a partial match like "1Password" matching "1Password for Safari")
             appstore_app_name=$(echo "$appstore_match" | sed 's/ (.*)//')
             if [[ "$appstore_app_name" == "$app_name" ]]; then
-                # Check if already added to avoid duplicates
-                if [[ ! " ${appstore_list[@]} " =~ " ${appstore_match} " ]]; then
-                    appstore_list+=("$appstore_match")
-                fi
+                # Skip if managed by mas
                 continue
             fi
         fi
-        
+
         # Skip system apps and utilities
         if [[ "$app_name" == "Utilities" || "$app_name" == "System Preferences" ]]; then
             continue
         fi
-        
+
         # Everything else is manual (avoid duplicates)
         if [[ ! " ${manual_list[@]} " =~ " ${app_name} " ]]; then
             manual_list+=("$app_name")
@@ -94,99 +86,108 @@ for app_path in /Applications/*.app; do
     fi
 done
 
-# Also scan for non-.app files and directories in /Applications/
+# Also scan for directories containing .app files in /Applications/
 for item in /Applications/*; do
     if [ -d "$item" ]; then
         item_name=$(basename "$item")
-        # Skip system directories but include others
-        if [[ "$item_name" != "Utilities" ]] && [[ "$item_name" != *.app ]]; then
-            # Check if it's not already in our lists
-            if [[ ! " ${manual_list[@]} " =~ " ${item_name} " ]]; then
-                # Special cases for known directory-based apps
-                if [[ "$item_name" == "Setapp" ]] || [[ "$item_name" == "Datacolor" ]]; then
+
+        # Skip .app bundles themselves and Setapp (handled separately)
+        if [[ "$item_name" != *.app ]] && [[ "$item_name" != "Setapp" ]]; then
+            # Check if directory contains any .app files
+            if ls "$item"/*.app &>/dev/null 2>&1; then
+                # This directory contains apps, add it to manual list if not already there
+                if [[ ! " ${manual_list[@]} " =~ " ${item_name} " ]]; then
                     manual_list+=("$item_name")
                 fi
             fi
         fi
-        
-        # Include Utilities as it was in the original list
-        if [[ "$item_name" == "Utilities" ]]; then
-            if [[ ! " ${manual_list[@]} " =~ " ${item_name} " ]]; then
-                manual_list+=("$item_name")
-            fi
-        fi
     fi
 done
 
-# Generate apps.yml
-cat > apps.yml << 'EOF'
-# Application inventory organized by installation method
-# Auto-generated from /Applications/ folder
+# Scan Setapp directory for apps if it exists
+declare -a setapp_list
+if [ -d "/Applications/Setapp" ]; then
+    echo -e "${BLUE}Scanning /Applications/Setapp/ for Setapp-installed apps...${NC}"
+    for app_path in /Applications/Setapp/*.app; do
+        if [ -d "$app_path" ]; then
+            app_name=$(basename "$app_path" .app)
+            setapp_list+=("$app_name")
+        fi
+    done
+fi
 
-homebrew_cask:
+# Generate apps.yml with manual and Setapp apps
+cat > "$SCRIPT_DIR/apps.yml" << 'EOF'
+# Manually installed applications not managed by brew/cask/mas
+# Auto-generated from /Applications/ folder
+# Apps in Brewfile.macos are excluded from this list
+
+manual:
 EOF
 
-# Add homebrew casks
-for app in "${homebrew_list[@]}"; do
-    echo "  - $app" >> apps.yml
-done
-
-echo "" >> apps.yml
-echo "appstore:" >> apps.yml
-
-# Add app store apps  
-for app in "${appstore_list[@]}"; do
-    echo "  - \"$app\"" >> apps.yml
-done
-
-echo "" >> apps.yml
-echo "manual:" >> apps.yml
-
 # Add manual apps
-for app in "${manual_list[@]}"; do
-    echo "  - \"$app\"" >> apps.yml
-done
+if [ ${#manual_list[@]} -eq 0 ]; then
+    echo "  []  # No manual apps found" >> "$SCRIPT_DIR/apps.yml"
+else
+    for app in "${manual_list[@]}"; do
+        echo "  - \"$app\"" >> "$SCRIPT_DIR/apps.yml"
+    done
+fi
 
-echo -e "${GREEN}✓ Generated apps/apps.yml with ${#homebrew_list[@]} homebrew, ${#appstore_list[@]} appstore, and ${#manual_list[@]} manual apps${NC}"
+# Add Setapp section if there are Setapp apps
+if [ ${#setapp_list[@]} -gt 0 ]; then
+    cat >> "$SCRIPT_DIR/apps.yml" << 'EOF'
 
-echo -e "\n${BLUE}Checking installation status...${NC}"
+# Apps installed via Setapp
+setapp:
+EOF
+    for app in "${setapp_list[@]}"; do
+        echo "  - \"$app\"" >> "$SCRIPT_DIR/apps.yml"
+    done
+fi
 
-# Check Homebrew cask apps
-echo -e "\n${YELLOW}Homebrew Cask Applications:${NC}"
-for app in "${homebrew_list[@]}"; do
-    if brew list --cask "$app" &>/dev/null; then
-        echo -e "${GREEN}✓${NC} $app"
-    else
-        echo -e "${RED}✗${NC} $app (not installed via Homebrew)"
-    fi
-done
+echo -e "${GREEN}✓ Generated apps/apps.yml${NC}"
+echo -e "  • ${#manual_list[@]} manual apps"
+if [ ${#setapp_list[@]} -gt 0 ]; then
+    echo -e "  • ${#setapp_list[@]} Setapp apps"
+fi
+echo -e "  (Excluded: $(brew list --cask 2>/dev/null | wc -l | xargs) brew casks and $(mas list 2>/dev/null | wc -l | xargs) App Store apps already in Brewfile)"
 
-# Check App Store apps
-echo -e "\n${YELLOW}Mac App Store Applications:${NC}"
-for app in "${appstore_list[@]}"; do
-    # Extract app name (remove version info in parentheses)
-    app_name=$(echo "$app" | sed 's/ (.*)//')
-    if [ -d "/Applications/$app_name.app" ]; then
-        echo -e "${GREEN}✓${NC} $app"
-    else
-        echo -e "${RED}✗${NC} $app (not installed)"
-    fi
-done
+if [ ${#manual_list[@]} -gt 0 ]; then
+    echo -e "\n${YELLOW}Manually Installed Applications:${NC}"
+    echo "(These apps are not managed by brew or mas)"
+    for app in "${manual_list[@]}"; do
+        if [ -d "/Applications/$app.app" ] || [ -L "/Applications/$app.app" ] || [ -d "/Applications/$app" ]; then
+            echo -e "${GREEN}✓${NC} $app"
+        else
+            echo -e "${RED}✗${NC} $app (not found - may have been removed)"
+        fi
+    done
+fi
 
-# Check manually installed apps
-echo -e "\n${YELLOW}Manually Installed Applications:${NC}"
-echo "(These need to be downloaded and installed manually)"
-for app in "${manual_list[@]}"; do
-    if [ -d "/Applications/$app.app" ] || [ -L "/Applications/$app.app" ] || [ -d "/Applications/$app" ]; then
-        echo -e "${GREEN}✓${NC} $app (installed)"
-    else
-        echo -e "${RED}✗${NC} $app (not installed)"
-    fi
-done
+if [ ${#setapp_list[@]} -gt 0 ]; then
+    echo -e "\n${YELLOW}Setapp Applications:${NC}"
+    echo "(These apps are installed via Setapp)"
+    for app in "${setapp_list[@]}"; do
+        if [ -d "/Applications/Setapp/$app.app" ]; then
+            echo -e "${GREEN}✓${NC} $app"
+        else
+            echo -e "${RED}✗${NC} $app (not found - may have been removed)"
+        fi
+    done
+fi
+
+if [ ${#manual_list[@]} -eq 0 ] && [ ${#setapp_list[@]} -eq 0 ]; then
+    echo -e "\n${GREEN}All installed apps are managed by brew or mas!${NC}"
+fi
 
 echo -e "\n======================================================"
-echo "Installation instructions:"
-echo "1. Run: brew bundle --file=brew/Brewfile.macos"
-echo "2. Manually install apps marked with ✗ from the manual section"
-echo "3. Sign in to Mac App Store and install missing apps"
-echo "4. Run this script again to update the inventory"
+echo "Notes:"
+echo "• Brew-managed apps: See brew/Brewfile.macos"
+echo "• To install all brew/mas apps: brew bundle --file=brew/Brewfile.macos"
+if [ ${#manual_list[@]} -gt 0 ]; then
+    echo "• Manual apps listed above need to be installed separately"
+fi
+if [ ${#setapp_list[@]} -gt 0 ]; then
+    echo "• Setapp apps require an active Setapp subscription"
+fi
