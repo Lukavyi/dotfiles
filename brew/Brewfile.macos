@@ -27,6 +27,7 @@ cask "zoom"
 
 # Mac App Store applications
 mas "1Password for Safari", id: 1569813296
+mas "Accelerate", id: 1459809092
 mas "Amphetamine", id: 937984704
 mas "Blackmagic Disk Speed Test", id: 425264550
 mas "Craft", id: 1487937127
