@@ -284,8 +284,8 @@ function git_auto_fetch() {
 
     [[ -f $fetch_marker ]] && last_fetch=$(<$fetch_marker)
 
-    # Only fetch if 5+ minutes have passed
-    if (( current_time - last_fetch > 300 )); then
+    # Only fetch if 1+ minute have passed
+    if (( current_time - last_fetch > 60 )); then
       (git fetch --all &>/dev/null &)
       echo $current_time > $fetch_marker
     fi
