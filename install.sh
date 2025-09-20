@@ -134,10 +134,10 @@ BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
 
 # List of files that stow will try to create
 DOTFILES_TO_CHECK=(
-    ".zshrc" ".zprofile"           # from zsh/
-    ".gitconfig" ".gitignore"      # from git/
-    ".tmux.conf"                    # from tmux/
-    ".p10k.zsh"                     # from p10k/
+    ".zshrc" ".zshenv" ".zprofile"  # from zsh/
+    ".gitconfig" ".gitignore"       # from git/
+    ".tmux.conf"                     # from tmux/
+    ".p10k.zsh"                      # from p10k/
 )
 
 # Also check .config subdirectories
