@@ -233,13 +233,6 @@ alias reload-bash="source ~/.bashrc"
 # Terminal info alias
 alias terminfo='echo "TERM=$TERM"; echo "Colors: $(tput colors)"; echo "COLORTERM=$COLORTERM"'
 
-# Claude CLI - detect correct path
-if [[ -x "$HOME/.claude/local/claude" ]]; then
-    alias claude="$HOME/.claude/local/claude"
-elif [[ -x "/home/linuxbrew/.linuxbrew/lib/node_modules/@claude/cli/bin/claude" ]]; then
-    alias claude="/home/linuxbrew/.linuxbrew/lib/node_modules/@claude/cli/bin/claude"
-fi
-
 # ============================================================================
 # Platform-specific Configuration
 # ============================================================================
