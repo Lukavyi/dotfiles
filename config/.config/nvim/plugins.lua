@@ -31,4 +31,19 @@ return {
     "gennaro-tedesco/nvim-jqx",
     ft = { "json", "yaml" },
   },
+
+  -- Yazi file manager integration
+  {
+    "mikavilpas/yazi.nvim",
+    version = "*", -- use the latest stable version
+    event = "VeryLazy",
+    dependencies = {
+      { "nvim-lua/plenary.nvim", lazy = true },
+    },
+    opts = {
+      open_for_directories = false,
+      floating_window_scaling_factor = 0.9,
+      yazi_floating_window_border = "rounded",
+    },
+  },
 }
