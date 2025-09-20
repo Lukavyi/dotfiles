@@ -135,9 +135,6 @@ fi
 # WebStorm CLI (if installed)
 [[ -d "/Applications/WebStorm.app/Contents/MacOS" ]] && export PATH="$PATH:/Applications/WebStorm.app/Contents/MacOS"
 
-# Container/workspace paths (if they exist)
-[[ -d "/workspace/node_modules/.bin" ]] && export PATH="/workspace/node_modules/.bin:$PATH"
-
 # ============================================================================
 # Environment Setup
 # ============================================================================
