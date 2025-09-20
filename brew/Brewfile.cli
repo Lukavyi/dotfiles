@@ -44,6 +44,7 @@ brew "sst/tap/opencode"
 # Terminal file manager (blazing fast, written in Rust)
 brew "yazi"
 # Dependencies for Yazi file manager
+brew "file"          # File type detection for Yazi (required on Linux)
 brew "sevenzip"      # Archive operations for Yazi
 brew "poppler"       # PDF preview support for Yazi
 brew "imagemagick"   # Image processing for Yazi
