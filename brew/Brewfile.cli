@@ -47,3 +47,10 @@ brew "yazi"
 brew "sevenzip"      # Archive operations for Yazi
 brew "poppler"       # PDF preview support for Yazi
 brew "imagemagick"   # Image processing for Yazi
+
+# CLI tools that work on both macOS and Linux
+brew "libarchive"    # Archive library
+brew "rclone"        # Cloud storage sync
+brew "rsync"         # File sync utility
+brew "smartmontools" # Disk monitoring
+brew "wget"          # Download tool
