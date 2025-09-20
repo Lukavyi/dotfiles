@@ -130,7 +130,8 @@ fi
 # Check and backup existing dotfiles that might conflict with stow
 echo "Checking for existing dotfiles..."
 BACKUP_NEEDED=false
-BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%Y%m%d-%H%M%S)"
+BACKUP_PARENT_DIR="$HOME/dotfiles-backups"
+BACKUP_DIR="$BACKUP_PARENT_DIR/$(date +%Y-%m-%d_%H-%M-%S)"
 
 # List of files that stow will try to create
 DOTFILES_TO_CHECK=(
@@ -168,6 +169,7 @@ done
 if [[ "$BACKUP_NEEDED" == true ]]; then
     echo -e "${YELLOW}⚠ Found existing dotfiles that would conflict with stow${NC}"
     echo "  Creating backup in: $BACKUP_DIR"
+    mkdir -p "$BACKUP_PARENT_DIR"
     mkdir -p "$BACKUP_DIR"
 
     # Backup regular dotfiles
