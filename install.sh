@@ -195,25 +195,6 @@ if [[ "$BACKUP_NEEDED" == true ]]; then
     echo ""
 fi
 
-# Stow configurations (explicit list - easy to see and modify)
-echo "Linking configuration files..."
-for dir in zsh git tmux p10k config; do
-    if [[ -d "$dir" ]]; then
-        echo "  Stowing $dir..."
-        stow "$dir"
-    fi
-done
-
-# Set up local git config if it doesn't exist
-if [[ ! -f "$HOME/.gitconfig.local" ]] && [[ -f "git/.gitconfig.local.example" ]]; then
-    echo -e "${BLUE}Setting up local git configuration...${NC}"
-    cp git/.gitconfig.local.example "$HOME/.gitconfig.local"
-    echo -e "${YELLOW}⚠ Please edit ~/.gitconfig.local with your personal git information:${NC}"
-    echo "    - name: Your name for git commits"
-    echo "    - email: Your email for git commits"
-    echo "    - signingkey: Your SSH signing key (if using commit signing)"
-fi
-
 # Install NvChad if nvim is installed
 if command -v nvim &>/dev/null; then
     echo -e "${BLUE}Installing NvChad with custom configuration...${NC}"
@@ -239,6 +220,25 @@ if command -v nvim &>/dev/null; then
 
     echo -e "${GREEN}✓ NvChad installed with custom configuration${NC}"
     echo -e "${YELLOW}  Run 'nvim' and wait for plugins to install on first launch${NC}"
+fi
+
+# Stow configurations (explicit list - easy to see and modify)
+echo "Linking configuration files..."
+for dir in zsh git tmux p10k config; do
+    if [[ -d "$dir" ]]; then
+        echo "  Stowing $dir..."
+        stow "$dir"
+    fi
+done
+
+# Set up local git config if it doesn't exist
+if [[ ! -f "$HOME/.gitconfig.local" ]] && [[ -f "git/.gitconfig.local.example" ]]; then
+    echo -e "${BLUE}Setting up local git configuration...${NC}"
+    cp git/.gitconfig.local.example "$HOME/.gitconfig.local"
+    echo -e "${YELLOW}⚠ Please edit ~/.gitconfig.local with your personal git information:${NC}"
+    echo "    - name: Your name for git commits"
+    echo "    - email: Your email for git commits"
+    echo "    - signingkey: Your SSH signing key (if using commit signing)"
 fi
 
 # Install TPM (Tmux Plugin Manager) if not already installed
