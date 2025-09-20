@@ -214,8 +214,8 @@ if [[ ! -f "$HOME/.gitconfig.local" ]] && [[ -f "git/.gitconfig.local.example" ]
     echo "    - signingkey: Your SSH signing key (if using commit signing)"
 fi
 
-# Install NvChad if nvim config exists
-if [[ -d "config/.config/nvim" ]]; then
+# Install NvChad if nvim is installed
+if command -v nvim &>/dev/null; then
     echo -e "${BLUE}Installing NvChad with custom configuration...${NC}"
 
     # Backup existing nvim config if it exists
