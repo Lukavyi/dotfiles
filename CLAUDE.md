@@ -117,3 +117,4 @@ cd apps && ./check_apps.sh
 
 ### Machine-specific configuration
 Use `~/.zshrc.local` for machine-specific settings (created automatically by install.sh)
+- Don't add terminal commands that asks user stuff in @install.sh cause in some cases it's being built in docker
