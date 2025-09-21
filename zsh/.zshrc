@@ -20,17 +20,6 @@ fi
 # ============================================================================
 # Terminal Configuration
 # ============================================================================
-# Auto-install terminfo from dotfiles if not available
-# This ensures custom terminals like ghostty work on all machines
-if ! infocmp -x "$TERM" >/dev/null 2>&1; then
-    # Check if we have a terminfo source file in dotfiles
-    if [[ -f "$HOME/dotfiles/terminfo/${TERM}.ti" ]]; then
-        # Compile and install the terminfo file
-        tic -x "$HOME/dotfiles/terminfo/${TERM}.ti" 2>/dev/null && \
-            echo "Installed terminfo for $TERM from dotfiles"
-    fi
-fi
-
 # Function to detect and set the best available terminal
 set_terminal() {
     # Check if we're inside tmux
@@ -42,16 +31,23 @@ set_terminal() {
         return
     fi
 
-    # First, try to use ghostty if its terminfo is available
-    # This is preferred for Ghostty terminal emulator
-    if infocmp xterm-ghostty >/dev/null 2>&1; then
-        export TERM=xterm-ghostty
-    elif infocmp ghostty >/dev/null 2>&1; then
-        export TERM=ghostty
-    elif [ "$TERM" = "xterm" ] || [ "$TERM" = "linux" ]; then
-        # Upgrade to 256 color if available
+    # Check if we're on Linux - always use xterm-256color there
+    if [[ "$(uname -s)" == "Linux" ]]; then
+        # On Linux, always use xterm-256color (skip ghostty)
         if infocmp xterm-256color >/dev/null 2>&1; then
             export TERM=xterm-256color
+        fi
+    else
+        # On macOS/other systems, try ghostty first
+        if infocmp xterm-ghostty >/dev/null 2>&1; then
+            export TERM=xterm-ghostty
+        elif infocmp ghostty >/dev/null 2>&1; then
+            export TERM=ghostty
+        elif [ "$TERM" = "xterm" ] || [ "$TERM" = "linux" ]; then
+            # Upgrade to 256 color if available
+            if infocmp xterm-256color >/dev/null 2>&1; then
+                export TERM=xterm-256color
+            fi
         fi
     fi
 }
