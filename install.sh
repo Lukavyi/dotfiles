@@ -85,6 +85,15 @@ if ! command -v brew &>/dev/null; then
     echo -e "${GREEN}✓ Homebrew installed and added to PATH${NC}"
 fi
 
+# Update Homebrew formulae and upgrade packages
+echo "Updating Homebrew formulae..."
+brew update
+echo -e "${GREEN}✓ Homebrew updated${NC}"
+
+echo "Upgrading Homebrew packages..."
+brew upgrade
+echo -e "${GREEN}✓ Homebrew packages upgraded${NC}"
+
 # Install packages from appropriate Brewfile based on OS
 if [[ "$OS" == "macos" ]] && [[ -f "brew/Brewfile.macos" ]]; then
     echo "Installing Homebrew packages for macOS..."
