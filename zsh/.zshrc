@@ -276,6 +276,20 @@ esac
 
 function git_auto_fetch() {
   if [[ -d .git ]]; then
+    # Check if git user is configured
+    local user_email=$(git config --get user.email 2>/dev/null)
+    local user_name=$(git config --get user.name 2>/dev/null)
+
+    # Skip fetch if no user credentials
+    if [[ -z "$user_email" ]] || [[ -z "$user_name" ]]; then
+      return
+    fi
+
+    # Check if we can reach the remote (skip fetch if auth fails)
+    if ! git ls-remote --exit-code -h origin &>/dev/null 2>&1; then
+      return
+    fi
+
     local fetch_marker=".git/LAST_AUTO_FETCH"
     local current_time=$(date +%s)
     local last_fetch=0
