@@ -31,3 +31,9 @@ backup.sh
 
 # IDE configuration
 .idea
+
+# NvChad custom configs (handled separately by install.sh)
+nvchad-custom
+
+# Ignore nvim in config directory (NvChad is installed separately)
+config/.config/nvim

@@ -212,11 +212,11 @@ if command -v nvim &>/dev/null; then
 
     # Apply custom configurations (only the modified files)
     echo "Applying custom configurations..."
-    cp "$DOTFILES_DIR/config/.config/nvim/chadrc.lua" ~/.config/nvim/lua/chadrc.lua
-    cp "$DOTFILES_DIR/config/.config/nvim/mappings.lua" ~/.config/nvim/lua/mappings.lua
-    cp "$DOTFILES_DIR/config/.config/nvim/options.lua" ~/.config/nvim/lua/options.lua
-    cp "$DOTFILES_DIR/config/.config/nvim/conform.lua" ~/.config/nvim/lua/configs/conform.lua
-    cp "$DOTFILES_DIR/config/.config/nvim/plugins.lua" ~/.config/nvim/lua/plugins/init.lua
+    cp "$DOTFILES_DIR/nvchad-custom/chadrc.lua" ~/.config/nvim/lua/chadrc.lua
+    cp "$DOTFILES_DIR/nvchad-custom/mappings.lua" ~/.config/nvim/lua/mappings.lua
+    cp "$DOTFILES_DIR/nvchad-custom/options.lua" ~/.config/nvim/lua/options.lua
+    cp "$DOTFILES_DIR/nvchad-custom/conform.lua" ~/.config/nvim/lua/configs/conform.lua
+    cp "$DOTFILES_DIR/nvchad-custom/plugins.lua" ~/.config/nvim/lua/plugins/init.lua
 
     echo -e "${GREEN}✓ NvChad installed with custom configuration${NC}"
     echo -e "${YELLOW}  Run 'nvim' and wait for plugins to install on first launch${NC}"
@@ -224,6 +224,8 @@ fi
 
 # Stow configurations (explicit list - easy to see and modify)
 echo "Linking configuration files..."
+# Ensure ~/.config exists to prevent stow from folding it into a single symlink in docker
+mkdir -p ~/.config
 for dir in zsh git tmux p10k config; do
     if [[ -d "$dir" ]]; then
         echo "  Stowing $dir..."
