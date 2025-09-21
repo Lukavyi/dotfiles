@@ -276,13 +276,27 @@ esac
 
 function git_auto_fetch() {
   if [[ -d .git ]]; then
-    # Check if git user is configured
-    local user_email=$(git config --get user.email 2>/dev/null)
-    local user_name=$(git config --get user.name 2>/dev/null)
+    # Get the remote URL to check if it's a GitHub repository
+    local remote_url=$(git config --get remote.origin.url 2>/dev/null)
 
-    # Skip fetch if no user credentials
-    if [[ -z "$user_email" ]] || [[ -z "$user_name" ]]; then
-      return
+    # Check if this is a GitHub repository
+    if [[ "$remote_url" =~ github\.com ]]; then
+      # For GitHub repos, use gh auth instead of local git config
+      # Check GitHub authentication status
+      if ! gh auth status &>/dev/null 2>&1; then
+        # Not logged in to GitHub CLI, skip fetch and notify user
+        echo "GitHub auto-fetch disabled: run 'gh auth login' to enable"
+        return
+      fi
+    else
+      # For non-GitHub repos, check if git user is configured
+      local user_email=$(git config --get user.email 2>/dev/null)
+      local user_name=$(git config --get user.name 2>/dev/null)
+
+      # Skip fetch if no user credentials for non-GitHub repos
+      if [[ -z "$user_email" ]] || [[ -z "$user_name" ]]; then
+        return
+      fi
     fi
 
     # Check if we can reach the remote (skip fetch if auth fails)
