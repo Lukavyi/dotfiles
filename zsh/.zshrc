@@ -20,6 +20,17 @@ fi
 # ============================================================================
 # Terminal Configuration
 # ============================================================================
+# Auto-install terminfo from dotfiles if not available
+# This ensures custom terminals like ghostty work on all machines
+if ! infocmp -x "$TERM" >/dev/null 2>&1; then
+    # Check if we have a terminfo source file in dotfiles
+    if [[ -f "$HOME/dotfiles/terminfo/${TERM}.ti" ]]; then
+        # Compile and install the terminfo file
+        tic -x "$HOME/dotfiles/terminfo/${TERM}.ti" 2>/dev/null && \
+            echo "Installed terminfo for $TERM from dotfiles"
+    fi
+fi
+
 # Function to detect and set the best available terminal
 set_terminal() {
     # Check if we're inside tmux
