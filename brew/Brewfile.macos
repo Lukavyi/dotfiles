@@ -10,33 +10,75 @@ brew "mas"
 cask "1password"
 cask "1password-cli"
 cask "alt-tab"
+cask "araxis-merge"
 cask "arc"
+cask "beeper"
 cask "betterdisplay"
+cask "bezel"
+cask "chatgpt"
+cask "claude"
+cask "daisydisk"
+cask "descript"
+cask "thebrowsercompany-dia"
 cask "discord"
 cask "docker-desktop"
+cask "figma"
+cask "flux-app"
 cask "ghostty"
+cask "google-chrome"
+cask "google-drive"
+cask "handbrake"
 cask "hazel"
+cask "hey-desktop"
+cask "hyperkey"
+cask "ia-presenter"
+cask "iina"
+cask "imageoptim"
 cask "jetbrains-toolbox"
+cask "keyboard-maestro"
+cask "ledger-live"
 cask "little-snitch"
+cask "lm-studio"
+cask "macwhisper"
+cask "monitorcontrol"
 cask "notion"
+cask "obs"
 cask "ollama-app"
+cask "pdf-expert"
 cask "raycast"
+cask "readwise-ibooks"
+cask "recut"
+cask "rocket"
+cask "screen-studio"
+cask "send-to-kindle"
 cask "setapp"
+cask "sigmaos"
+cask "signal"
+cask "soundsource"
 cask "spotify"
+cask "synology-drive"
+cask "tor-browser"
+cask "trezor-suite"
 cask "vlc"
+cask "webstorm"
+cask "xmind"
+cask "yubico-authenticator"
 cask "zoom"
 
 # Mac App Store applications
 mas "1Password for Safari", id: 1569813296
 mas "Accelerate", id: 1459809092
 mas "Actions", id: 1586435171
+mas "Affinity Photo 2", id: 1616822987
 mas "Amphetamine", id: 937984704
 mas "Blackmagic Disk Speed Test", id: 425264550
 mas "Craft", id: 1487937127
 mas "Craft Web Clipper", id: 6748613311
 mas "Data Jar", id: 1453273600
+mas "DaVinci Resolve", id: 571213070
 mas "Dropover", id: 1355679052
 mas "Fantastical", id: 975937182
+mas "FileZilla Pro - FTP and Cloud", id: 1298486723
 mas "Flighty", id: 1358823008
 mas "Folder Preview", id: 6698876601
 mas "Frame.io", id: 992958444
