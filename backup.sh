@@ -40,16 +40,6 @@ if command -v brew &>/dev/null; then
     fi
 fi
 
-# Backup local zsh config if it exists
-if [[ -f ~/.zshrc.local ]]; then
-    if [[ "$DRY_RUN" == true ]]; then
-        echo "  [DRY-RUN] Would backup ~/.zshrc.local"
-    else
-        cp ~/.zshrc.local zsh/.zshrc.local.example 2>/dev/null || true
-        echo -e "${GREEN}✓${NC} Local zsh config backed up"
-    fi
-fi
-
 # For macOS: update apps inventory
 if [[ "$OSTYPE" == "darwin"* ]] && [[ -f apps/check_apps.sh ]]; then
     if [[ "$DRY_RUN" == true ]]; then
