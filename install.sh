@@ -148,6 +148,7 @@ CONFIG_DIRS_TO_CHECK=(
     ".config/htop"
     ".config/nvim"
     ".config/thefuck"
+    ".config/yazi"
 )
 
 # Check if any regular files exist and aren't already symlinks
