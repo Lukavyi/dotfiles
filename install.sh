@@ -195,32 +195,6 @@ if [[ "$BACKUP_NEEDED" == true ]]; then
     echo ""
 fi
 
-# Install NvChad if nvim is installed
-if command -v nvim &>/dev/null; then
-    echo -e "${BLUE}Installing NvChad with custom configuration...${NC}"
-
-    # Backup existing nvim config if it exists
-    if [[ -d ~/.config/nvim ]]; then
-        echo -e "${YELLOW}⚠ Backing up existing Neovim config to ~/.config/nvim.backup${NC}"
-        rm -rf ~/.config/nvim.backup
-        mv ~/.config/nvim ~/.config/nvim.backup
-    fi
-
-    # Clone fresh NvChad starter
-    echo "Cloning NvChad starter..."
-    git clone https://github.com/NvChad/starter ~/.config/nvim --depth 1
-
-    # Apply custom configurations (only the modified files)
-    echo "Applying custom configurations..."
-    cp "$DOTFILES_DIR/nvchad-custom/chadrc.lua" ~/.config/nvim/lua/chadrc.lua
-    cp "$DOTFILES_DIR/nvchad-custom/mappings.lua" ~/.config/nvim/lua/mappings.lua
-    cp "$DOTFILES_DIR/nvchad-custom/options.lua" ~/.config/nvim/lua/options.lua
-    cp "$DOTFILES_DIR/nvchad-custom/conform.lua" ~/.config/nvim/lua/configs/conform.lua
-    cp "$DOTFILES_DIR/nvchad-custom/plugins.lua" ~/.config/nvim/lua/plugins/init.lua
-
-    echo -e "${GREEN}✓ NvChad installed with custom configuration${NC}"
-    echo -e "${YELLOW}  Run 'nvim' and wait for plugins to install on first launch${NC}"
-fi
 
 # Stow configurations (explicit list - easy to see and modify)
 echo "Linking configuration files..."
@@ -263,6 +237,11 @@ fi
 if [[ -f "npm/install.sh" ]]; then
     echo "Installing global npm packages..."
     bash npm/install.sh
+fi
+
+if [[ -f "nvchad-custom/install.sh" ]]; then
+    echo "Installing NvChad configuration..."
+    bash nvchad-custom/install.sh
 fi
 
 # Platform-specific: Check macOS applications
