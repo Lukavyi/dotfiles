@@ -42,6 +42,7 @@ brew "yq"
 brew "zoxide"
 brew "zsh"
 brew "sst/tap/opencode"
+brew "coreutils"
 
 # Terminal file manager (blazing fast, written in Rust)
 brew "yazi"
