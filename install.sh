@@ -217,6 +217,37 @@ for dir in zsh git tmux p10k config; do
     fi
 done
 
+# Setup NVM and install latest LTS Node.js
+echo -e "${BLUE}Setting up NVM and Node.js...${NC}"
+export NVM_DIR="$HOME/.nvm"
+
+# Load NVM based on OS
+if [[ "$OS" == "macos" ]]; then
+    # macOS - check both Intel and Apple Silicon paths
+    if [[ -s "/opt/homebrew/opt/nvm/nvm.sh" ]]; then
+        source "/opt/homebrew/opt/nvm/nvm.sh"
+    elif [[ -s "/usr/local/opt/nvm/nvm.sh" ]]; then
+        source "/usr/local/opt/nvm/nvm.sh"
+    fi
+else
+    # Linux
+    if [[ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]]; then
+        source "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
+    fi
+fi
+
+# Check if NVM is loaded
+if command -v nvm &>/dev/null; then
+    echo "Installing latest LTS Node.js via NVM..."
+    nvm install --lts
+    nvm use --lts
+    nvm alias default 'lts/*'
+    echo -e "${GREEN}✓ Node.js $(node --version) installed and set as default${NC}"
+    echo -e "${GREEN}✓ npm $(npm --version) is now available${NC}"
+else
+    echo -e "${YELLOW}⚠ NVM not found. Node.js will need to be installed manually${NC}"
+fi
+
 # Install TPM (Tmux Plugin Manager) if not already installed
 if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
     echo -e "${BLUE}Installing Tmux Plugin Manager (TPM)...${NC}"

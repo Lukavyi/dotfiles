@@ -20,10 +20,24 @@ if [[ ! -f "package.json" ]]; then
     exit 1
 fi
 
-# Check if npm is available
+# Check if npm is available (from NVM or system)
 if ! command -v npm &>/dev/null; then
-    echo -e "${RED}✗ npm is not installed. Please install Node.js/npm first${NC}"
-    exit 1
+    # Try to load NVM if not already loaded
+    export NVM_DIR="$HOME/.nvm"
+    if [[ -s "/opt/homebrew/opt/nvm/nvm.sh" ]]; then
+        source "/opt/homebrew/opt/nvm/nvm.sh"
+    elif [[ -s "/usr/local/opt/nvm/nvm.sh" ]]; then
+        source "/usr/local/opt/nvm/nvm.sh"
+    elif [[ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]]; then
+        source "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
+    fi
+
+    # Check again after potentially loading NVM
+    if ! command -v npm &>/dev/null; then
+        echo -e "${RED}✗ npm is not installed. Please install Node.js via NVM first${NC}"
+        echo -e "${YELLOW}⚠ Run: nvm install --lts && nvm use --lts${NC}"
+        exit 1
+    fi
 fi
 
 # Install packages globally

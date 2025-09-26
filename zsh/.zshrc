@@ -121,6 +121,33 @@ plugins=(git fzf web-search zsh-syntax-highlighting zsh-autosuggestions)
 # Basic paths
 export PATH="$HOME/.local/bin:$PATH"
 
+# NVM (Node Version Manager)
+export NVM_DIR="$HOME/.nvm"
+# Load NVM based on OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS - check both Intel and Apple Silicon paths
+    if [[ -s "/opt/homebrew/opt/nvm/nvm.sh" ]]; then
+        source "/opt/homebrew/opt/nvm/nvm.sh"
+    elif [[ -s "/usr/local/opt/nvm/nvm.sh" ]]; then
+        source "/usr/local/opt/nvm/nvm.sh"
+    fi
+    # NVM bash completion
+    if [[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]]; then
+        source "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+    elif [[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ]]; then
+        source "/usr/local/opt/nvm/etc/bash_completion.d/nvm"
+    fi
+else
+    # Linux
+    if [[ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]]; then
+        source "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
+    fi
+    # NVM bash completion
+    if [[ -s "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm" ]]; then
+        source "/home/linuxbrew/.linuxbrew/opt/nvm/etc/bash_completion.d/nvm"
+    fi
+fi
+
 # pnpm (if installed)
 if [[ -d "$HOME/Library/pnpm" ]]; then
     export PNPM_HOME="$HOME/Library/pnpm"
