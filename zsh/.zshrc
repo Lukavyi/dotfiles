@@ -220,6 +220,7 @@ alias l.="eza -a | grep -E '^\.'"
 # Git aliases
 alias lg="lazygit"                                     # Terminal UI for git (from Synology-Homebrew)
 alias lzd="lazydocker"                                 # Terminal UI for Docker
+alias lnpm="lazynpm"                                   # Terminal UI for npm
 alias gst="git status"
 alias gd="git diff"
 alias gdc="git diff --cached"
