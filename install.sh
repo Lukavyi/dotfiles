@@ -270,6 +270,11 @@ else
 fi
 
 # Run special installers if they exist
+if [[ -f "git/install.sh" ]]; then
+    echo "Installing git configuration..."
+    bash git/install.sh
+fi
+
 if [[ -f "claude/install.sh" ]]; then
     echo "Installing Claude configuration..."
     (cd claude && bash install.sh)
