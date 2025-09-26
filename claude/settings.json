@@ -10,19 +10,5 @@
   "statusLine": {
     "type": "command",
     "command": "npx -y @owloops/claude-powerline@latest --style=powerline"
-  },
-  "mcpServers": {
-    "zen": {
-      "command": "uv",
-      "args": [
-        "run",
-        "--python=3.12",
-        "server.py"
-      ],
-      "cwd": "$HOME/.local/share/mcp-servers/zen-mcp-server",
-      "env": {
-        "PYTHONPATH": "$HOME/.local/share/mcp-servers/zen-mcp-server"
-      }
-    }
   }
 }

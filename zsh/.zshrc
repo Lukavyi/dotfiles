@@ -215,6 +215,8 @@ source $ZSH/oh-my-zsh.sh
 # ============================================================================
 
 # Development shortcuts
+# MCP workaround: https://github.com/anthropics/claude-code/issues/5037
+alias claude="claude --mcp-config ~/.claude/.mcp.json"
 alias c="claude"
 alias oc="opencode"
 alias cs="claude-squad"
@@ -386,6 +388,10 @@ command -v thefuck &> /dev/null && eval "$(thefuck --alias)"
 
 # UV Python Package Manager
 [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
+
+# API Keys from pass for MCP servers
+export OPENROUTER_API_KEY="$(pass show api/openrouter 2>/dev/null || echo '')"
+export OPENAI_API_KEY="$(pass show api/openai 2>/dev/null || echo '')"
 
 # Source Powerlevel10k
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
