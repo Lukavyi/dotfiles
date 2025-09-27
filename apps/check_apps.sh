@@ -3,6 +3,12 @@
 # Auto-generate apps.yml with only manually installed applications
 # This script scans /Applications/ and excludes apps managed by brew/cask/mas
 
+# Exit gracefully if not on macOS
+if [[ "$(uname)" != "Darwin" ]]; then
+    echo "This script is for macOS only. Skipping app check."
+    exit 0
+fi
+
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
