@@ -38,5 +38,8 @@ nvchad-custom
 # Ignore nvim in config directory (NvChad is installed separately)
 config/.config/nvim
 
-# Git directory files that shouldn't be stowed
-git/install.sh
+# Ignore every shell script, anywhere in this package
+\.sh$
+
+# Ignore all example files
+.*\.example
