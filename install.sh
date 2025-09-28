@@ -72,8 +72,11 @@ main() {
         printf "${YELLOW}Building installer...${NC}\n"
         (cd "$DOTFILES_DIR/installer" && npm run build --silent)
 
-        # Run the Ink-based installer
-        (cd "$DOTFILES_DIR/installer" && node dist/cli.js)
+        # Clear console for clean UI
+        clear
+
+        # Run the Ink-based installer, passing through any arguments
+        (cd "$DOTFILES_DIR/installer" && node dist/cli.js "$@")
     else
         # Non-interactive mode - install everything
         printf "${CYAN}Running in non-interactive mode with all options...${NC}\n"
