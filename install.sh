@@ -1,312 +1,98 @@
 #!/bin/bash
 set -e
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# Source common utilities
+source "$(dirname "$0")/lib/common.sh"
 
-# Get the directory where this script is located
-DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-# Simple OS detection
-OS="unknown"
-[[ "$OSTYPE" == "darwin"* ]] && OS="macos"
-[[ "$OSTYPE" == "linux-gnu"* ]] && OS="linux"
-
-# Detect Linux distribution if on Linux
-DISTRO=""
-if [[ "$OS" == "linux" ]]; then
-    if [[ -f /etc/os-release ]]; then
-        . /etc/os-release
-        case "$ID" in
-            ubuntu|debian) DISTRO="debian" ;;
-            fedora|rhel|centos) DISTRO="redhat" ;;
-            arch|manjaro) DISTRO="arch" ;;
-            *) DISTRO="unknown" ;;
-        esac
-    fi
+# Check if we're in a non-interactive environment (Docker, CI, etc.)
+NON_INTERACTIVE=false
+if [[ "$1" == "--non-interactive" || "$1" == "-n" || -n "$CI" || -n "$DOCKER_CONTAINER" || ! -t 0 ]]; then
+    NON_INTERACTIVE=true
 fi
 
-echo -e "${BLUE}🏠 Setting up dotfiles for $OS...${NC}"
-[[ -n "$DISTRO" ]] && echo -e "${BLUE}  Linux distribution: $DISTRO${NC}"
+# Function to run all installations in order (for non-interactive mode)
+run_all_installations() {
+    # Core
+    bash "$DOTFILES_DIR/brew/install.sh"
 
-# Check we have the right directory structure
-if [[ ! -f "$DOTFILES_DIR/install.sh" || ! -d "$DOTFILES_DIR/brew" ]]; then
-    echo -e "${RED}✗ Dotfiles directory structure is incorrect${NC}"
-    exit 1
-fi
+    # Terminal & Shell
+    bash "$DOTFILES_DIR/zsh/install.sh"
+    bash "$DOTFILES_DIR/p10k/install.sh"
+    bash "$DOTFILES_DIR/tmux/install.sh"
 
-# Change to dotfiles directory for relative operations
-cd "$DOTFILES_DIR"
+    # Configurations
+    bash "$DOTFILES_DIR/config/install.sh"  # Stow
+    bash "$DOTFILES_DIR/git/install.sh"
+    bash "$DOTFILES_DIR/claude/install.sh"
 
-# Install essential system packages on Linux (required for Homebrew)
-if [[ "$OS" == "linux" ]] && [[ -n "$DISTRO" ]]; then
-    echo -e "${BLUE}Installing essential system packages...${NC}"
-    case "$DISTRO" in
-        debian)
-            sudo apt-get update
-            sudo apt-get install -y build-essential curl file git python3-pip
-            ;;
-        redhat)
-            sudo dnf groupinstall -y "Development Tools"
-            sudo dnf install -y curl file git python3-pip
-            ;;
-        arch)
-            sudo pacman -S --noconfirm base-devel curl file git python-pip
-            ;;
-        *)
-            echo -e "${YELLOW}⚠ Unknown Linux distribution. You may need to install build tools manually.${NC}"
-            ;;
-    esac
-fi
+    # Development
+    bash "$DOTFILES_DIR/nvm/install.sh"
+    bash "$DOTFILES_DIR/npm/install.sh"
+    bash "$DOTFILES_DIR/nvchad-custom/install.sh"
 
-# Install Homebrew first (needed for everything else)
-if ! command -v brew &>/dev/null; then
-    echo "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    # Add Homebrew to PATH based on OS
+    # macOS specific
     if [[ "$OS" == "macos" ]]; then
-        # Add to shell profiles for persistence
-        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile 2>/dev/null || true
-        echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile 2>/dev/null || true
-        # Try both Intel and Apple Silicon paths for current session
-        eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || eval "$(/usr/local/bin/brew shellenv)" 2>/dev/null
-    else
-        # Add to shell profiles for persistence on Linux
-        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
-        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.zprofile
-        # For current session
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" 2>/dev/null
+        bash "$DOTFILES_DIR/apps/check_apps.sh"
     fi
-    echo -e "${GREEN}✓ Homebrew installed and added to PATH${NC}"
-fi
+}
 
-# Update Homebrew formulae and upgrade packages
-echo "Updating Homebrew formulae..."
-brew update
-echo -e "${GREEN}✓ Homebrew updated${NC}"
+# Main installation logic
+main() {
+    printf "${BLUE}🏠 Setting up dotfiles for %s...${NC}\n" "$OS"
+    [[ -n "$DISTRO" ]] && printf "${BLUE}  Linux distribution: %s${NC}\n" "$DISTRO"
 
-echo "Upgrading Homebrew packages..."
-brew upgrade
-echo -e "${GREEN}✓ Homebrew packages upgraded${NC}"
-
-# Install packages from appropriate Brewfile based on OS
-if [[ "$OS" == "macos" ]] && [[ -f "brew/Brewfile.macos" ]]; then
-    echo "Installing Homebrew packages for macOS..."
-    brew bundle --file=brew/Brewfile.macos || {
-        echo -e "${YELLOW}⚠ Some packages may have failed to install${NC}"
-    }
-elif [[ "$OS" == "linux" ]] && [[ -f "brew/Brewfile.cli" ]]; then
-    echo "Installing Homebrew packages for Linux/CLI..."
-    brew bundle --file=brew/Brewfile.cli || {
-        echo -e "${YELLOW}⚠ Some packages may have failed to install${NC}"
-    }
-else
-    echo -e "${RED}✗ No appropriate Brewfile found for $OS${NC}"
-    echo "  Expected: brew/Brewfile.macos (macOS) or brew/Brewfile.cli (Linux)"
-    exit 1
-fi
-
-# Install Oh My Zsh if not already installed
-if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
-    echo "Installing Oh My Zsh..."
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-    echo -e "${GREEN}✓ Oh My Zsh installed${NC}"
-fi
-
-# Install Powerlevel10k theme
-if [[ ! -d "$HOME/.oh-my-zsh/custom/themes/powerlevel10k" ]]; then
-    echo "Installing Powerlevel10k theme..."
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-    echo -e "${GREEN}✓ Powerlevel10k theme installed${NC}"
-fi
-
-# Install Oh My Zsh plugins
-if [[ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" ]]; then
-    echo "Installing zsh-syntax-highlighting plugin..."
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-fi
-
-if [[ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" ]]; then
-    echo "Installing zsh-autosuggestions plugin..."
-    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-fi
-
-# Check and backup existing dotfiles that might conflict with stow
-echo "Checking for existing dotfiles..."
-BACKUP_NEEDED=false
-BACKUP_PARENT_DIR="$HOME/dotfiles-backups"
-BACKUP_DIR="$BACKUP_PARENT_DIR/$(date +%Y-%m-%d_%H-%M-%S)"
-
-# List of files that stow will try to create
-DOTFILES_TO_CHECK=(
-    ".zshrc" ".zshenv" ".zprofile"  # from zsh/
-    ".gitconfig" ".gitignore"       # from git/
-    ".tmux.conf"                     # from tmux/
-    ".p10k.zsh"                      # from p10k/
-)
-
-# Also check .config subdirectories
-CONFIG_DIRS_TO_CHECK=(
-    ".config/bat"
-    ".config/gh"
-    ".config/htop"
-    ".config/nvim"
-    ".config/thefuck"
-    ".config/yazi"
-)
-
-# Check if any regular files exist and aren't already symlinks
-for file in "${DOTFILES_TO_CHECK[@]}"; do
-    if [[ -e "$HOME/$file" ]] && [[ ! -L "$HOME/$file" ]]; then
-        BACKUP_NEEDED=true
-        break
+    # Check we have the right directory structure
+    if [[ ! -f "$DOTFILES_DIR/install.sh" ]]; then
+        printf "${RED}✗ Dotfiles directory structure is incorrect${NC}\n"
+        exit 1
     fi
-done
 
-# Check if any .config directories exist and aren't symlinks
-for dir in "${CONFIG_DIRS_TO_CHECK[@]}"; do
-    if [[ -e "$HOME/$dir" ]] && [[ ! -L "$HOME/$dir" ]]; then
-        BACKUP_NEEDED=true
-        break
-    fi
-done
+    # Change to dotfiles directory for relative operations
+    cd "$DOTFILES_DIR"
 
-if [[ "$BACKUP_NEEDED" == true ]]; then
-    echo -e "${YELLOW}⚠ Found existing dotfiles that would conflict with stow${NC}"
-    echo "  Creating backup in: $BACKUP_DIR"
-    mkdir -p "$BACKUP_PARENT_DIR"
-    mkdir -p "$BACKUP_DIR"
-
-    # Backup regular dotfiles
-    for file in "${DOTFILES_TO_CHECK[@]}"; do
-        if [[ -e "$HOME/$file" ]] && [[ ! -L "$HOME/$file" ]]; then
-            echo "  Backing up: $file"
-            mv "$HOME/$file" "$BACKUP_DIR/"
+    # Run installation based on mode
+    if [[ "$NON_INTERACTIVE" == false ]]; then
+        # Interactive mode - require Node.js and use Ink installer
+        if ! command -v node >/dev/null 2>&1; then
+            printf "${RED}✗ Node.js is required to run the interactive installer.${NC}\n"
+            printf "${YELLOW}Please install Node.js first: https://nodejs.org${NC}\n"
+            printf "${YELLOW}Or use non-interactive mode: ./install.sh --non-interactive${NC}\n"
+            exit 1
         fi
-    done
 
-    # Backup .config directories
-    mkdir -p "$BACKUP_DIR/.config"
-    for dir in "${CONFIG_DIRS_TO_CHECK[@]}"; do
-        if [[ -e "$HOME/$dir" ]] && [[ ! -L "$HOME/$dir" ]]; then
-            dir_name=$(basename "$dir")
-            echo "  Backing up: $dir"
-            mv "$HOME/$dir" "$BACKUP_DIR/.config/$dir_name"
+        printf "${BLUE}Starting interactive installer...${NC}\n"
+
+        # Install dependencies and build if needed
+        if [[ ! -d "$DOTFILES_DIR/installer/node_modules" ]]; then
+            printf "${YELLOW}Installing installer dependencies...${NC}\n"
+            (cd "$DOTFILES_DIR/installer" && npm install --silent)
         fi
-    done
 
-    echo -e "${GREEN}✓ Existing dotfiles backed up and removed${NC}"
-    echo "  Backup location: $BACKUP_DIR"
-    echo ""
-fi
+        # Build the TypeScript installer
+        printf "${YELLOW}Building installer...${NC}\n"
+        (cd "$DOTFILES_DIR/installer" && npm run build --silent)
 
-
-# Stow configurations (explicit list - easy to see and modify)
-echo "Linking configuration files..."
-# Ensure ~/.config exists to prevent stow from folding it into a single symlink in docker
-mkdir -p ~/.config
-for dir in zsh git tmux p10k config; do
-    if [[ -d "$dir" ]]; then
-        echo "  Stowing $dir..."
-        stow "$dir"
-    fi
-done
-
-# Setup NVM and install latest LTS Node.js
-echo -e "${BLUE}Setting up NVM and Node.js...${NC}"
-export NVM_DIR="$HOME/.nvm"
-
-# Load NVM based on OS
-if [[ "$OS" == "macos" ]]; then
-    # macOS - check both Intel and Apple Silicon paths
-    if [[ -s "/opt/homebrew/opt/nvm/nvm.sh" ]]; then
-        source "/opt/homebrew/opt/nvm/nvm.sh"
-    elif [[ -s "/usr/local/opt/nvm/nvm.sh" ]]; then
-        source "/usr/local/opt/nvm/nvm.sh"
-    fi
-else
-    # Linux
-    if [[ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]]; then
-        source "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
-    fi
-fi
-
-# Check if NVM is loaded
-if command -v nvm &>/dev/null; then
-    echo "Installing latest LTS Node.js via NVM..."
-    nvm install --lts
-    nvm use --lts
-    nvm alias default 'lts/*'
-    echo -e "${GREEN}✓ Node.js $(node --version) installed and set as default${NC}"
-    echo -e "${GREEN}✓ npm $(npm --version) is now available${NC}"
-else
-    echo -e "${YELLOW}⚠ NVM not found. Node.js will need to be installed manually${NC}"
-fi
-
-# Install TPM (Tmux Plugin Manager) if not already installed
-if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
-    echo -e "${BLUE}Installing Tmux Plugin Manager (TPM)...${NC}"
-    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-    echo -e "${GREEN}✓ TPM installed${NC}"
-
-    # Install tmux plugins automatically
-    echo "Installing tmux plugins..."
-    if "$HOME/.tmux/plugins/tpm/bin/install_plugins" 2>/dev/null; then
-        echo -e "${GREEN}✓ Tmux plugins installed${NC}"
+        # Run the Ink-based installer
+        (cd "$DOTFILES_DIR/installer" && node dist/cli.js)
     else
-        echo -e "${YELLOW}⚠ Tmux plugins installation may have failed. Run prefix+I in tmux to install manually.${NC}"
+        # Non-interactive mode - install everything
+        printf "${CYAN}Running in non-interactive mode with all options...${NC}\n"
+        echo ""
+        printf "${BOLD}${BLUE}Starting installation...${NC}\n"
+        echo ""
+
+        run_all_installations
+
+        echo ""
+        printf "${GREEN}✓ Installation complete!${NC}\n"
+        echo ""
+        echo "Next steps:"
+        echo "  1. Restart your shell or run: source ~/.zshrc"
+        if [[ "$OS" == "macos" ]]; then
+            echo "  2. Check missing apps: cd apps && ./check_apps.sh"
+        fi
     fi
-else
-    # Update existing plugins
-    echo "Updating tmux plugins..."
-    if "$HOME/.tmux/plugins/tpm/bin/update_plugins" all 2>/dev/null; then
-        echo -e "${GREEN}✓ Tmux plugins updated${NC}"
-    fi
-fi
+}
 
-# Run special installers if they exist
-if [[ -f "git/install.sh" ]]; then
-    echo "Installing git configuration..."
-    bash git/install.sh
-fi
-
-if [[ -f "claude/install.sh" ]]; then
-    echo "Installing Claude configuration..."
-    (cd claude && bash install.sh)
-fi
-
-if [[ -f "npm/install.sh" ]]; then
-    echo "Installing global npm packages..."
-    bash npm/install.sh
-fi
-
-if [[ -f "nvchad-custom/install.sh" ]]; then
-    echo "Installing NvChad configuration..."
-    bash nvchad-custom/install.sh
-fi
-
-# Platform-specific: Check macOS applications
-if [[ "$OS" == "macos" ]] && [[ -f "apps/check_apps.sh" ]]; then
-    echo "Checking macOS applications..."
-    (cd apps && bash check_apps.sh)
-fi
-
-# Create local config templates if they don't exist
-if [[ ! -f ~/.zshrc.local ]]; then
-    echo "# Machine-specific Zsh configuration" > ~/.zshrc.local
-    echo -e "${YELLOW}⚠ Created ~/.zshrc.local for machine-specific settings${NC}"
-fi
-
-echo ""
-echo -e "${GREEN}✓ Installation complete!${NC}"
-echo ""
-echo "Next steps:"
-echo "  1. Restart your shell or run: source ~/.zshrc"
-if [[ "$OS" == "macos" ]]; then
-    echo "  2. Check missing apps: cd apps && ./check_apps.sh"
-fi
+# Run main function
+main "$@"
