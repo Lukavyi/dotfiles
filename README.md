@@ -30,7 +30,7 @@ cd ~/dotfiles
 
 The installer will:
 - Install Homebrew (if needed)
-- Install packages from OS-specific Brewfile (Brewfile.macos or Brewfile.cli)
+- Install packages from profile-specific Brewfiles
 - Link configurations with stow
 - Set up special installers (npm, claude)
 - Check macOS apps (on macOS only)
@@ -44,8 +44,9 @@ If you prefer to see each step:
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Install packages (including stow)
-brew bundle --file=brew/Brewfile.macos  # macOS
-brew bundle --file=brew/Brewfile.cli    # Linux/CLI
+brew bundle --file=brew/Brewfile.basic    # Work profile (work-safe tools only)
+brew bundle --file=brew/Brewfile.personal # Personal CLI tools (add to basic)
+brew bundle --file=brew/Brewfile.macos    # macOS GUI apps (personal macOS only)
 
 # Link configurations
 stow zsh git tmux p10k config
@@ -78,7 +79,7 @@ The installer creates template files for machine-specific settings:
 ```
 
 This backs up:
-- Homebrew packages → `brew/Brewfile.macos` or `brew/Brewfile.cli`
+- Homebrew packages → `brew/Brewfile.basic`, `Brewfile.personal`, and `Brewfile.macos`
 - Local zsh config → `zsh/.zshrc.local.example`
 - macOS apps inventory → `apps/apps.yml` (macOS only)
 
@@ -103,7 +104,7 @@ stow -D config
 ## Structure
 
 - `apps/` - Application inventory and installation tracking (macOS)
-- `brew/` - Homebrew packages (Brewfile.cli for CLI tools, Brewfile.macos for macOS with GUI apps)
+- `brew/` - Homebrew packages (Brewfile.basic for work, Brewfile.personal for personal CLI, Brewfile.macos for GUI apps)
 - `claude/` - Claude Code CLI configuration (MCP servers)
 - `config/` - Miscellaneous .config subdirectories (bat, gh, htop, thefuck, nvim)
 - `git/` - Git configuration with `.gitconfig.local.example` template

@@ -12,24 +12,28 @@ This is a minimal personal dotfiles repository managed with GNU Stow for macOS a
 
 ### Setup and Installation
 ```bash
-# Full installation
+# Full installation (interactive mode - choose what to install)
 ./install.sh
 
+# Non-interactive installation with profiles
+./install.sh --non-interactive --work     # Work profile: work-safe tools only (default)
+./install.sh --non-interactive --personal # Personal profile: auto-detects OS for appropriate tools
+
 # Manual installation
-brew bundle --file=brew/Brewfile.macos  # macOS: Install all packages
-brew bundle --file=brew/Brewfile.cli    # Linux/CLI: Install CLI tools only
+brew bundle --file=brew/Brewfile.basic    # Work profile: work-safe tools only
+brew bundle --file=brew/Brewfile.personal # Personal CLI tools (add to basic)
+brew bundle --file=brew/Brewfile.macos    # macOS GUI apps and Mac App Store items
 stow zsh git tmux p10k config     # Link configurations
+cd nvm && bash install.sh && cd .. # Install Node Version Manager
 cd npm && npm install -g && cd .. # Install npm packages
+cd nvchad-custom && bash install.sh && cd .. # Install NvChad custom config
 cd claude && bash install.sh      # Install Claude config
 ```
 
 ### Backup and Update
 ```bash
-# Backup current configuration
-./backup.sh
-
-# Preview what would be backed up
-./backup.sh --dry-run
+# Interactive mode (choose backup from menu in the installer)
+./install.sh
 
 # Check macOS applications (macOS only)
 ./apps/check_apps.sh
@@ -48,44 +52,58 @@ stow -D zsh git tmux p10k config
 
 ### Core Scripts (simplified)
 
-- **`install.sh`** (85 lines) - Simple installer that:
-  - Installs Homebrew if needed
-  - Runs `brew bundle` to install all packages
-  - Links configs with stow (explicit list: zsh, git, tmux, p10k, config)
-  - Runs special installers (npm, claude)
-  - Checks macOS apps on macOS
+- **`install.sh`** - Unified installer:
+  - Default: Interactive mode with Node.js/Ink UI
+    - Choose between installation or backup mode in the UI
+    - Select specific components to install/backup
+  - Installation options:
+    - `--non-interactive` - Install everything automatically
+    - Installs Homebrew if needed
+    - Runs special installers (nvm, npm, nvchad-custom, claude)
+    - Links configs with stow
+    - Automatically backs up after installation in non-interactive mode
+  - Backup functionality:
+    - Available through the interactive UI menu
+    - Updates Brewfile.basic, Brewfile.personal, and Brewfile.macos based on installed packages
+    - Updates apps inventory on macOS
 
-- **`backup.sh`** (66 lines) - Minimal backup that:
-  - Updates Brewfile.macos or Brewfile.cli based on OS
-  - Backs up local zsh config
-  - Updates apps inventory on macOS
-  - Supports --dry-run to preview changes
-
-- **`apps/check_apps.sh`** (191 lines) - macOS app tracker:
+- **`apps/check_apps.sh`** - macOS app tracker:
   - Scans /Applications/
   - Categorizes by source (brew, appstore, manual)
   - Generates apps.yml inventory
   - Shows installation status
 
-### What Got Removed
+### What Got Simplified
 
-The repository was drastically simplified by removing:
-- **lib/** directory with 340+ lines of "framework" code
-- Dynamic directory discovery (not needed for 10 directories)
-- Pattern matching and auto-detection
-- Hooks, manifests, and configuration files
-- Interactive/verbose modes
-- Complex backup functions (SSH, GPG, history, etc.)
-- Support for multiple Linux distributions
+The repository was drastically simplified:
+- **lib/** reduced from 340+ lines to just common.sh (66 lines)
+- Dynamic directory discovery removed (not needed for explicit directories)
+- Pattern matching and auto-detection removed
+- Hooks, manifests, and configuration files removed
+- Complex backup functions (SSH, GPG, history, etc.) removed
+- Support for multiple Linux distributions simplified
+- Interactive mode reimplemented with modern Node.js/Ink UI
 
 ## Directory Structure
 
 - **`apps/`** - macOS application tracking
-- **`brew/`** - Brewfile.cli (CLI tools) and Brewfile.macos (includes CLI + GUI)
+  - `check_apps.sh` - Scans and inventories installed apps
+  - `backup.sh` - Updates apps.yml inventory
+- **`brew/`** - Homebrew configuration
+  - `Brewfile.basic` - Work-safe essential tools
+  - `Brewfile.personal` - Personal CLI tools (claude-squad, pass, opencode, ffmpeg, libusb)
+  - `Brewfile.macos` - macOS GUI apps (casks) and Mac App Store items
+  - `backup.sh` - Smart backup with deduplication
 - **`claude/`** - Claude Code CLI configuration
 - **`config/`** - .config/ subdirectories (bat, gh, nvim, etc.)
 - **`git/`** - Git configuration
+- **`installer/`** - Interactive installer UI (Ink-based TypeScript application)
+  - Handles both installation and backup operations
+  - Written in TypeScript with React/Ink
+- **`lib/`** - Common utilities (common.sh for shared functions)
 - **`npm/`** - Global npm packages
+- **`nvchad-custom/`** - NvChad custom configuration files
+- **`nvm/`** - Node Version Manager installation and setup
 - **`p10k/`** - Powerlevel10k theme
 - **`tmux/`** - Tmux configuration
 - **`zsh/`** - Zsh with Oh My Zsh
@@ -102,12 +120,13 @@ The repository was drastically simplified by removing:
 
 ### Add a new tool directory
 1. Create the directory with your dotfiles
-2. Add it to the stow list in `install.sh` (line ~48)
-3. That's it
+2. Add it to the installation list in `install.sh` (run_all_installations function)
+3. If using the interactive installer, add it to `installer/source/config.ts`
+4. That's it
 
 ### Add a new Homebrew package
 1. Run `brew install <package>`
-2. Run `./backup.sh` to update Brewfile.macos or Brewfile.cli
+2. Run `./install.sh` and choose backup from the menu to update Brewfiles
 3. Commit the changes
 
 ### Check what's installed on macOS

@@ -4,26 +4,60 @@ set -e
 # Source common utilities
 source "$(dirname "$0")/lib/common.sh"
 
-# Check if we're in a non-interactive environment (Docker, CI, etc.)
+# Parse command-line options
 NON_INTERACTIVE=false
-if [[ "$1" == "--non-interactive" || "$1" == "-n" || -n "$CI" || -n "$DOCKER_CONTAINER" || ! -t 0 ]]; then
+PROFILE="work"  # Default to work (work-safe)
+
+for arg in "$@"; do
+    case $arg in
+        --non-interactive|-n)
+            NON_INTERACTIVE=true
+            ;;
+        --work)
+            PROFILE="work"
+            ;;
+        --personal)
+            PROFILE="personal"
+            ;;
+        --help|-h)
+            echo "Usage: $0 [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  --non-interactive, -n   Run in non-interactive mode"
+            echo "  --work                  Install work profile (work-safe tools only, default)"
+            echo "  --personal              Install personal profile (auto-detects OS for appropriate tools)"
+            echo "  --help, -h              Show this help message"
+            exit 0
+            ;;
+    esac
+done
+
+# Check if we're in a non-interactive environment
+if [[ -n "$CI" || -n "$DOCKER_CONTAINER" || ! -t 0 ]]; then
     NON_INTERACTIVE=true
 fi
 
 # Function to run all installations in order (for non-interactive mode)
 run_all_installations() {
-    # Core
-    bash "$DOTFILES_DIR/brew/install.sh"
+    # Core - pass profile to brew installer
+    PROFILE="$PROFILE" bash "$DOTFILES_DIR/brew/install.sh"
 
     # Terminal & Shell
     bash "$DOTFILES_DIR/zsh/install.sh"
     bash "$DOTFILES_DIR/p10k/install.sh"
     bash "$DOTFILES_DIR/tmux/install.sh"
 
-    # Configurations
+    # Configurations (includes personal directory stowing if personal profile)
     bash "$DOTFILES_DIR/config/install.sh"  # Stow
-    bash "$DOTFILES_DIR/git/install.sh"
-    bash "$DOTFILES_DIR/claude/install.sh"
+
+    # Personal profile configurations (if requested)
+    if [[ "$PROFILE" == "personal" ]]; then
+        # Git configuration only for personal profiles (uses pass)
+        bash "$DOTFILES_DIR/git/install.sh"
+
+        # Claude configuration for personal profiles
+        bash "$DOTFILES_DIR/claude/install.sh"
+    fi
 
     # Development
     bash "$DOTFILES_DIR/nvm/install.sh"
@@ -35,6 +69,7 @@ run_all_installations() {
         bash "$DOTFILES_DIR/apps/check_apps.sh"
     fi
 }
+
 
 # Main installation logic
 main() {
@@ -49,6 +84,7 @@ main() {
 
     # Change to dotfiles directory for relative operations
     cd "$DOTFILES_DIR"
+
 
     # Run installation based on mode
     if [[ "$NON_INTERACTIVE" == false ]]; then
@@ -75,8 +111,8 @@ main() {
         # Clear console for clean UI
         clear
 
-        # Run the Ink-based installer, passing through any arguments
-        (cd "$DOTFILES_DIR/installer" && node dist/cli.js "$@")
+        # Run the Ink-based installer
+        (cd "$DOTFILES_DIR/installer" && node dist/cli.js)
     else
         # Non-interactive mode - install everything
         printf "${CYAN}Running in non-interactive mode with all options...${NC}\n"

@@ -30,9 +30,17 @@ fi
 
 echo -e "${BLUE}Scanning /Applications/ for apps not managed by brew or mas...${NC}"
 
-# Get lists of apps managed by package managers (to exclude them)
+# Get lists of apps managed by package managers
 homebrew_casks=$(brew list --cask 2>/dev/null | sort)
 appstore_apps=$(mas list 2>/dev/null | awk '{$1=""; print $0}' | sed 's/^ //' | sort)
+
+# Parse Brewfile.macos to see what's defined (not just installed)
+brewfile_casks=""
+brewfile_mas=""
+if [ -f "$SCRIPT_DIR/../brew/Brewfile.macos" ]; then
+    brewfile_casks=$(grep '^cask "' "$SCRIPT_DIR/../brew/Brewfile.macos" 2>/dev/null | sed 's/^cask "\([^"]*\)".*/\1/' | sort)
+    brewfile_mas=$(grep '^mas "' "$SCRIPT_DIR/../brew/Brewfile.macos" 2>/dev/null | sed 's/^mas "\([^"]*\)".*/\1/' | sort)
+fi
 
 # Initialize array for manual apps only
 declare -a manual_list
@@ -157,7 +165,7 @@ echo -e "  • ${#manual_list[@]} manual apps"
 if [ ${#setapp_list[@]} -gt 0 ]; then
     echo -e "  • ${#setapp_list[@]} Setapp apps"
 fi
-echo -e "  (Excluded: $(brew list --cask 2>/dev/null | wc -l | xargs) brew casks and $(mas list 2>/dev/null | wc -l | xargs) App Store apps already in Brewfile)"
+echo -e "  (Excluded: $(brew list --cask 2>/dev/null | wc -l | xargs) installed brew casks and $(mas list 2>/dev/null | wc -l | xargs) installed App Store apps)"
 
 if [ ${#manual_list[@]} -gt 0 ]; then
     echo -e "\n${YELLOW}Manually Installed Applications:${NC}"
@@ -188,6 +196,45 @@ if [ ${#manual_list[@]} -eq 0 ] && [ ${#setapp_list[@]} -eq 0 ]; then
 fi
 
 echo -e "\n======================================================"
+
+# Check for discrepancies between Brewfile and installed apps
+if [ -n "$brewfile_casks" ] || [ -n "$brewfile_mas" ]; then
+    echo -e "${BLUE}Checking Brewfile.macos consistency...${NC}"
+
+    # Check for casks in Brewfile but not installed
+    missing_casks=""
+    for cask in $brewfile_casks; do
+        if ! echo "$homebrew_casks" | grep -q "^${cask}$"; then
+            missing_casks="$missing_casks $cask"
+        fi
+    done
+
+    # Check for installed casks not in Brewfile
+    extra_casks=""
+    for cask in $homebrew_casks; do
+        if ! echo "$brewfile_casks" | grep -q "^${cask}$"; then
+            extra_casks="$extra_casks $cask"
+        fi
+    done
+
+    if [ -n "$missing_casks" ]; then
+        echo -e "${YELLOW}⚠ Casks in Brewfile.macos but not installed:${NC}"
+        for cask in $missing_casks; do
+            echo "  • $cask"
+        done
+    fi
+
+    if [ -n "$extra_casks" ]; then
+        echo -e "${YELLOW}⚠ Installed casks not in Brewfile.macos:${NC}"
+        for cask in $extra_casks; do
+            echo "  • $cask"
+        done
+        echo "  (Run './install.sh --backup' to update Brewfile.macos)"
+    fi
+
+    echo ""
+fi
+
 echo "Notes:"
 echo "• Brew-managed apps: See brew/Brewfile.macos"
 echo "• To install all brew/mas apps: brew bundle --file=brew/Brewfile.macos"

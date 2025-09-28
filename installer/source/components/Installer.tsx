@@ -1,5 +1,5 @@
-import { FC, useMemo } from 'react';
-import { useState, useEffect } from 'react';
+import type { FC } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Box, Text } from 'ink';
 import Spinner from 'ink-spinner';
 import { execa } from 'execa';
@@ -8,12 +8,14 @@ import type { Categories } from '../config.js';
 interface InstallerProps {
   categories: Categories;
   selections: string[];
+  profile?: 'work' | 'personal';
   onComplete: () => void;
 }
 
 const Installer: FC<InstallerProps> = ({
   categories,
   selections,
+  profile = 'work',
   onComplete,
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -46,11 +48,15 @@ const Installer: FC<InstallerProps> = ({
             ? process.cwd().replace(/\/installer.*$/, '')
             : process.cwd();
 
-          // Call the script directly
+          // Call the script directly, passing profile for installations
           const subprocess = execa(item.script, [], {
             cwd: dotfilesDir,
             shell: false,
             reject: false,
+            env: {
+              ...process.env,
+              PROFILE: profile,
+            },
           });
 
           // Stream stdout
@@ -118,7 +124,7 @@ const Installer: FC<InstallerProps> = ({
   return (
     <Box flexDirection="column">
       <Text color="cyan" bold>
-        Installing components...
+        Installing components ({profile} profile)...
       </Text>
       <Box marginTop={1}>
         <Text>

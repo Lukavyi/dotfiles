@@ -38,6 +38,15 @@ install_stow_configs() {
         fi
     done
 
+    # Stow personal directory for personal profiles
+    if [[ "$PROFILE" == "personal" ]]; then
+        if [[ -d "personal" ]]; then
+            echo "  Stowing personal directory..."
+            stow --adopt personal
+            print_success "Personal profile configurations linked"
+        fi
+    fi
+
     # Show what was adopted
     if [[ -n $(git status --porcelain 2>/dev/null) ]]; then
         print_warning "Existing configs were adopted into the repository."

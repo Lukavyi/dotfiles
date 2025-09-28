@@ -1,132 +1,149 @@
-import { FC, useCallback } from 'react';
-import { useState } from 'react';
-import { Box, Text, useApp, useInput } from 'ink';
+import type { FC } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useApp, useInput } from 'ink';
 import { categories, defaultSelections } from './config.js';
-import CategoryList from './components/CategoryList.js';
-import Summary from './components/Summary.js';
+import { filterCategoriesByProfile } from './utils/filterByProfile.js';
+import { useNavigation } from './hooks/useNavigation.js';
+import ItemSelector from './components/ItemSelector.js';
+import Confirmation from './components/Confirmation.js';
+import CompletionScreen from './components/CompletionScreen.js';
 import Installer from './components/Installer.js';
 
 type Phase = 'selecting' | 'confirming' | 'installing' | 'complete';
+type Profile = 'work' | 'personal';  // UI shows work/personal, maps to actual profiles
 
 const App: FC = () => {
   const [phase, setPhase] = useState<Phase>('selecting');
+  const [profile, setProfile] = useState<Profile>('work');
   const [selections, setSelections] = useState<string[]>(defaultSelections);
-  const [cursor, setCursor] = useState(0);
   const { exit } = useApp();
 
-  const totalItems = Object.values(categories).flat().length;
+  // Filter categories based on profile
+  const activeCategories = useMemo(() => {
+    return filterCategoriesByProfile(categories, profile);
+  }, [profile]);
 
+  // Use navigation hook
+  const {
+    cursor,
+    moveUp,
+    moveDown,
+    getCurrentItem,
+    getCategoryItemIds,
+    flatItems,
+  } = useNavigation(activeCategories);
+
+  // Handle input
   useInput((input, key) => {
     if (phase === 'selecting') {
       if (key.upArrow) {
-        setCursor((prev) => (prev - 1 + totalItems) % totalItems);
+        moveUp();
       } else if (key.downArrow) {
-        setCursor((prev) => (prev + 1) % totalItems);
-      } else if (input === ' ') {
-        const allItems = Object.values(categories).flat();
-        const currentItem = allItems[cursor];
-        setSelections((prev) =>
-          prev.includes(currentItem.id)
-            ? prev.filter((id) => id !== currentItem.id)
-            : [...prev, currentItem.id]
-        );
-      } else if (input === 'a' || input === 'A') {
-        const allItems = Object.values(categories).flat();
-        const allItemIds = allItems.map((item) => item.id);
+        moveDown();
+      } else if (key.tab) {
+        // Toggle profile between work and personal
+        const newProfile = profile === 'work' ? 'personal' : 'work';
+        setProfile(newProfile);
 
-        // If all items are selected, deselect all
-        // Otherwise, select all
+        // Clean up selections when switching to work - remove personal-only items
+        if (newProfile === 'work') {
+          const newCategories = filterCategoriesByProfile(categories, 'work');
+          const validIds = Object.values(newCategories).flat().map(item => item.id);
+          setSelections(prev => prev.filter(id => validIds.includes(id)));
+        }
+      } else if (input === ' ') {
+        const currentItem = getCurrentItem();
+        if (currentItem.isCategory) {
+          // Toggle all items in category
+          const categoryItemIds = getCategoryItemIds(currentItem.categoryName);
+          const allSelected = categoryItemIds.every((id) =>
+            selections.includes(id)
+          );
+          if (allSelected) {
+            setSelections((prev) =>
+              prev.filter((id) => !categoryItemIds.includes(id))
+            );
+          } else {
+            setSelections((prev) => [
+              ...prev.filter((id) => !categoryItemIds.includes(id)),
+              ...categoryItemIds,
+            ]);
+          }
+        } else {
+          // Toggle single item
+          setSelections((prev) =>
+            prev.includes(currentItem.id)
+              ? prev.filter((id) => id !== currentItem.id)
+              : [...prev, currentItem.id]
+          );
+        }
+      } else if (input === 'a' || input === 'A') {
+        // Toggle all items globally
+        const allItems = Object.values(activeCategories).flat();
+        const allItemIds = allItems.map((item) => item.id);
         if (allItemIds.every((id) => selections.includes(id))) {
           setSelections([]);
         } else {
           setSelections(allItemIds);
         }
       } else if (key.return) {
-        setPhase('confirming' as Phase);
+        setPhase('confirming');
       } else if (input === 'q' || key.escape) {
         exit();
       }
     } else if (phase === 'confirming') {
       if (input === 'y' || input === 'Y') {
-        // Only proceed if something is selected
         if (selections.length > 0) {
-          setPhase('installing' as Phase);
+          setPhase('installing');
         } else {
-          // Skip directly to complete if nothing selected
-          setPhase('complete' as Phase);
+          setPhase('complete');
         }
       } else if (input === 'n' || input === 'N') {
-        setPhase('selecting' as Phase);
+        setPhase('selecting');
       } else if (key.escape) {
         exit();
       }
     }
   });
 
-  const setComplete = useCallback(() => setPhase('complete' as Phase), []);
+  const handleComplete = useCallback(() => setPhase('complete'), []);
 
-  if (phase === 'selecting') {
-    return (
-      <Box flexDirection="column">
-        <Text color="green" bold>
-          🏠 Dotfiles Installation Wizard
-        </Text>
-        <Text dimColor>
-          Use arrow keys to navigate, space to toggle, a to select/deselect all,
-          enter to confirm
-        </Text>
-        <Box marginTop={1}>
-          <CategoryList
-            categories={categories}
-            selections={selections}
-            cursor={cursor}
-          />
-        </Box>
-      </Box>
-    );
+  switch (phase) {
+    case 'selecting':
+      return (
+        <ItemSelector
+          categories={activeCategories}
+          selections={selections}
+          cursor={cursor}
+          profile={profile}
+          flatItems={flatItems}
+        />
+      );
+
+    case 'confirming':
+      return (
+        <Confirmation
+          categories={activeCategories}
+          selections={selections}
+        />
+      );
+
+    case 'installing':
+      return (
+        <Installer
+          categories={activeCategories}
+          selections={selections}
+          profile={profile}
+          onComplete={handleComplete}
+        />
+      );
+
+    case 'complete':
+      return <CompletionScreen selections={selections} />;
+
+    default:
+      return null;
   }
-
-  if (phase === 'confirming') {
-    return (
-      <Box flexDirection="column">
-        <Summary categories={categories} selections={selections} />
-        <Box marginTop={1}>
-          <Text>Proceed with installation? (y/n)</Text>
-        </Box>
-      </Box>
-    );
-  }
-
-  if (phase === 'installing') {
-    return (
-      <Installer
-        categories={categories}
-        selections={selections}
-        onComplete={setComplete}
-      />
-    );
-  }
-
-  if (phase === 'complete') {
-    return (
-      <Box flexDirection="column">
-        <Text color="green" bold>
-          {selections.length > 0
-            ? '✓ Installation complete!'
-            : 'No components were installed'}
-        </Text>
-        {selections.length > 0 && (
-          <Box marginTop={1} flexDirection="column">
-            <Text>Next steps:</Text>
-            <Text> 1. Restart your shell or run: source ~/.zshrc</Text>
-            <Text> 2. Check missing apps: cd apps && ./check_apps.sh</Text>
-          </Box>
-        )}
-      </Box>
-    );
-  }
-
-  return null;
 };
 
 export default App;

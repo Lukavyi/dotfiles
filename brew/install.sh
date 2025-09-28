@@ -5,7 +5,7 @@ set -e
 source "$(dirname "$0")/../lib/common.sh"
 
 # Get profile from environment or default to work
-# Profiles: work, personal-linux, personal-macos
+# Profiles: work, personal (auto-detects OS)
 PROFILE="${PROFILE:-work}"
 
 install_system_packages() {
@@ -95,18 +95,18 @@ install_brew_packages() {
         work)
             print_success "Work profile packages installed"
             ;;
-        personal-linux)
+        personal)
             install_brewfile "Brewfile.personal" "personal"
-            print_success "Personal Linux profile packages installed"
-            ;;
-        personal-macos)
-            install_brewfile "Brewfile.personal" "personal"
-            install_brewfile "Brewfile.macos" "macOS"
-            print_success "Personal macOS profile packages installed"
+            if [[ "$OS" == "macos" ]]; then
+                install_brewfile "Brewfile.macos" "macOS"
+                print_success "Personal macOS profile packages installed"
+            else
+                print_success "Personal Linux profile packages installed"
+            fi
             ;;
         *)
             print_error "Unknown profile: $PROFILE"
-            echo "Valid profiles: work, personal-linux, personal-macos"
+            echo "Valid profiles: work, personal"
             exit 1
             ;;
     esac
