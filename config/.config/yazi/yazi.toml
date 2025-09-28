@@ -1,5 +1,20 @@
 # Yazi configuration file
 
+###############################################################################
+# Columns / layout                                                           #
+###############################################################################
 [mgr]
-# Show hidden files and folders by default
-show_hidden = true
+# Layout ratios (parent : current : preview)
+# A 1 : 2 : 3 split makes the current pane roomy, keeps context, and
+# reserves generous space for previews on wide terminals.
+ratio          = [1, 2, 3]
+
+# File ordering
+sort_by        = "natural"   # human-friendly (1, 2, 10 instead of 1,10,2)
+sort_dir_first = true        # folders first
+sort_reverse   = false       # newest-first? set true if you prefer
+sort_sensitive = false       # ignore case
+
+# Visibility flags
+show_hidden    = true        # show hidden files and folders
+show_symlink   = true        # highlight links in list
