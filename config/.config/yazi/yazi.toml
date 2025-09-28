@@ -32,3 +32,30 @@ max_height     = 900         # reasonable height limit
 cache_dir      = ""          # use default cache location
 image_filter   = "triangle"  # scaling algorithm for images
 image_quality  = 75          # JPEG quality for cached thumbnails
+
+###############################################################################
+# File opener rules                                                          #
+###############################################################################
+[open]
+rules = [
+	# 1. Directories – simply enter them
+	{ name = "*/", use = ["open"] },
+
+	# 2. Plain-text files – open in $EDITOR
+	{ mime = "text/*", use = ["edit"] },
+
+	# 3. All other files – use system default
+	{ name = "*", use = ["open"] },
+]
+
+[opener]
+# Open in editor (blocking so you return to the same yazi session)
+edit = [
+	{ run = '${EDITOR:-vi} "$@"', desc = "Edit in $EDITOR", block = true, for = "unix" },
+]
+
+# System default opener
+open = [
+	{ run = 'open "$@"', desc = "Open with default app", for = "macos" },
+	{ run = 'xdg-open "$@"', desc = "Open with default app", for = "linux" },
+]
