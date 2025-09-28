@@ -214,13 +214,6 @@ source $ZSH/oh-my-zsh.sh
 # Aliases
 # ============================================================================
 
-# Development shortcuts
-# MCP workaround: https://github.com/anthropics/claude-code/issues/5037
-alias claude="claude --mcp-config ~/.claude/.mcp.json"
-alias c="claude"
-alias oc="opencode"
-alias cs="claude-squad"
-
 # Editor aliases
 alias vim="nvim"                                       # Use neovim instead of vim (from Synology-Homebrew)
 alias vi="nvim"                                        # Use neovim instead of vi (from Synology-Homebrew)
@@ -267,15 +260,6 @@ alias reload-bash="source ~/.bashrc"
 
 # Terminal info alias
 alias terminfo='echo "TERM=$TERM"; echo "Colors: $(tput colors)"; echo "COLORTERM=$COLORTERM"'
-
-# ============================================================================
-# Platform-specific Configuration
-# ============================================================================
-
-# macOS: 1Password SSH Agent
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-fi
 
 # ============================================================================
 # Git Platform Auto-Detect
@@ -389,10 +373,6 @@ command -v thefuck &> /dev/null && eval "$(thefuck --alias)"
 # UV Python Package Manager
 [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 
-# API Keys from pass for MCP servers
-export OPENROUTER_API_KEY="$(pass show api/openrouter 2>/dev/null || echo '')"
-export OPENAI_API_KEY="$(pass show api/openai 2>/dev/null || echo '')"
-
 # Source Powerlevel10k
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
@@ -433,3 +413,6 @@ testtruecolors() {
 # .zshrc.$(hostname -s) can be used for configs specific to a hostname
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 [[ -f ~/.zshrc.$(hostname -s) ]] && source ~/.zshrc.$(hostname -s)
+
+# Personal configuration (if installed with personal profile)
+[[ -f ~/.zshrc.personal ]] && source ~/.zshrc.personal

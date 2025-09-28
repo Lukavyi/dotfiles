@@ -1,0 +1,25 @@
+#!/bin/zsh
+# Personal configuration - Personal additions not for work machines
+# This file is only sourced when dotfiles are installed with personal profile
+
+# ============================================================================
+# AI/Claude Development Tools
+# ============================================================================
+# MCP workaround: https://github.com/anthropics/claude-code/issues/5037
+alias claude="claude --mcp-config ~/.claude/.mcp.json"
+alias c="claude"
+alias oc="opencode"
+alias cs="claude-squad"
+
+# ============================================================================
+# API Keys from pass
+# ============================================================================
+export OPENROUTER_API_KEY="$(pass show api/openrouter 2>/dev/null || echo '')"
+export OPENAI_API_KEY="$(pass show api/openai 2>/dev/null || echo '')"
+
+# ============================================================================
+# 1Password SSH Agent (macOS)
+# ============================================================================
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+fi
