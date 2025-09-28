@@ -1,25 +1,36 @@
-# Include all CLI tools from Brewfile.cli
-instance_eval(File.read(File.join(__dir__, "Brewfile.cli")))
+# macOS-only packages - GUI apps and Mac App Store items
+# These are only installed on personal macOS machines
 
 # macOS-specific CLI tools
-brew "ffmpeg"
-brew "libusb"
-brew "mas"
+brew "mas"  # Mac App Store CLI
+brew "ffmpeg"  # Media processing
+brew "libusb"  # USB library
 
-# GUI applications (Casks)
+# Personal GUI applications (Casks)
 cask "1password"
 cask "1password-cli"
-cask "alt-tab"
-cask "araxis-merge"
-cask "arc"
 cask "beeper"
-cask "betterdisplay"
-cask "bezel"
 cask "chatgpt"
 cask "claude"
 cask "daisydisk"
-cask "descript"
 cask "discord"
+cask "ledger-live"
+cask "lm-studio"
+cask "notion"
+cask "ollama-app"
+cask "signal"
+cask "spotify"
+cask "synology-drive"
+cask "tor-browser"
+cask "trezor-suite"
+
+# Development & Productivity GUI
+cask "alt-tab"
+cask "araxis-merge"
+cask "arc"
+cask "betterdisplay"
+cask "bezel"
+cask "descript"
 cask "docker-desktop"
 cask "figma"
 cask "flux-app"
@@ -35,14 +46,10 @@ cask "iina"
 cask "imageoptim"
 cask "jetbrains-toolbox"
 cask "keyboard-maestro"
-cask "ledger-live"
 cask "little-snitch"
-cask "lm-studio"
 cask "macwhisper"
 cask "monitorcontrol"
-cask "notion"
 cask "obs"
-cask "ollama-app"
 cask "pdf-expert"
 cask "raycast"
 cask "readwise-ibooks"
@@ -51,20 +58,15 @@ cask "screen-studio"
 cask "send-to-kindle"
 cask "setapp"
 cask "sigmaos"
-cask "signal"
 cask "soundsource"
-cask "spotify"
-cask "synology-drive"
 cask "thebrowsercompany-dia"
-cask "tor-browser"
-cask "trezor-suite"
 cask "vlc"
 cask "webstorm"
 cask "xmind"
 cask "yubico-authenticator"
 cask "zoom"
 
-# Mac App Store applications
+# Mac App Store applications (personal)
 mas "1Password for Safari", id: 1569813296
 mas "Accelerate", id: 1459809092
 mas "Actions", id: 1586435171

@@ -1,0 +1,8 @@
+# Personal CLI tools - for personal machines only
+# These are NOT installed on work machines
+
+# Personal developer tools
+tap "sst/tap"
+brew "claude-squad"
+brew "pass"
+brew "sst/tap/opencode"

@@ -4,6 +4,10 @@ set -e
 # Source common utilities
 source "$(dirname "$0")/../lib/common.sh"
 
+# Get profile from environment or default to work
+# Profiles: work, personal-linux, personal-macos
+PROFILE="${PROFILE:-work}"
+
 install_system_packages() {
     # Install essential system packages on Linux (required for Homebrew)
     if [[ "$OS" == "linux" ]] && [[ -n "$DISTRO" ]]; then
@@ -65,24 +69,47 @@ install_brew_packages() {
         print_success "Homebrew packages upgraded"
     fi
 
-    # Install packages from appropriate Brewfile based on OS
-    if [[ "$OS" == "macos" ]] && [[ -f "$DOTFILES_DIR/brew/Brewfile.macos" ]]; then
-        echo "Installing Homebrew packages for macOS..."
-        brew bundle --file="$DOTFILES_DIR/brew/Brewfile.macos" || {
-            print_warning "Some packages may have failed to install"
-        }
-        print_success "Homebrew packages installed"
-    elif [[ "$OS" == "linux" ]] && [[ -f "$DOTFILES_DIR/brew/Brewfile.cli" ]]; then
-        echo "Installing Homebrew packages for Linux/CLI..."
-        brew bundle --file="$DOTFILES_DIR/brew/Brewfile.cli" || {
-            print_warning "Some packages may have failed to install"
-        }
-        print_success "Homebrew packages installed"
-    else
-        print_error "No appropriate Brewfile found for $OS"
-        echo "  Expected: brew/Brewfile.macos (macOS) or brew/Brewfile.cli (Linux)"
-        exit 1
-    fi
+    # Helper function to install a Brewfile
+    install_brewfile() {
+        local brewfile="$1"
+        local description="$2"
+
+        if [[ -f "$DOTFILES_DIR/brew/$brewfile" ]]; then
+            brew bundle --file="$DOTFILES_DIR/brew/$brewfile" || {
+                print_warning "Some $description packages may have failed to install"
+            }
+        else
+            print_error "$brewfile not found"
+            exit 1
+        fi
+    }
+
+    # Install packages based on profile
+    echo "Installing Homebrew packages ($PROFILE profile)..."
+
+    # All profiles get basic packages
+    install_brewfile "Brewfile.basic" "basic"
+
+    # Personal profiles get additional packages
+    case "$PROFILE" in
+        work)
+            print_success "Work profile packages installed"
+            ;;
+        personal-linux)
+            install_brewfile "Brewfile.personal" "personal"
+            print_success "Personal Linux profile packages installed"
+            ;;
+        personal-macos)
+            install_brewfile "Brewfile.personal" "personal"
+            install_brewfile "Brewfile.macos" "macOS"
+            print_success "Personal macOS profile packages installed"
+            ;;
+        *)
+            print_error "Unknown profile: $PROFILE"
+            echo "Valid profiles: work, personal-linux, personal-macos"
+            exit 1
+            ;;
+    esac
 }
 
 # Main execution
