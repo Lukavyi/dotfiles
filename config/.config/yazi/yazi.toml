@@ -18,3 +18,17 @@ sort_sensitive = false       # ignore case
 # Visibility flags
 show_hidden    = true        # show hidden files and folders
 show_symlink   = true        # highlight links in list
+
+# File-list look & feel
+linemode       = "mtime"     # prepend modified-time column (size|mtime|permissions)
+scrolloff      = 5           # keep 5 rows of context above/below cursor
+
+###############################################################################
+# Preview pane                                                               #
+###############################################################################
+[preview]
+max_width      = 600         # don't let previews occupy too much width
+max_height     = 900         # reasonable height limit
+cache_dir      = ""          # use default cache location
+image_filter   = "triangle"  # scaling algorithm for images
+image_quality  = 75          # JPEG quality for cached thumbnails
