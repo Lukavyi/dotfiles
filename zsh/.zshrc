@@ -113,7 +113,7 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Plugins - combined from both versions
-plugins=(git fzf web-search zsh-syntax-highlighting zsh-autosuggestions)
+plugins=(git fzf zsh-syntax-highlighting zsh-autosuggestions)
 
 # ============================================================================
 # PATH Configuration
