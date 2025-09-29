@@ -160,9 +160,6 @@ fi
 # Homebrew OpenJDK (macOS ARM)
 [[ -d "/opt/homebrew/opt/openjdk/bin" ]] && export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 
-# LM Studio CLI (if installed)
-[[ -d "$HOME/.lmstudio/bin" ]] && export PATH="$PATH:$HOME/.lmstudio/bin"
-
 # Go
 [[ -d "$HOME/go/bin" ]] && export PATH="$PATH:$HOME/go/bin"
 

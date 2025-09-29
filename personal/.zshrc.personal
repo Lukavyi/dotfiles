@@ -18,6 +18,12 @@ export OPENROUTER_API_KEY="$(pass show api/openrouter 2>/dev/null || echo '')"
 export OPENAI_API_KEY="$(pass show api/openai 2>/dev/null || echo '')"
 
 # ============================================================================
+# Development Tools
+# ============================================================================
+# LM Studio CLI (if installed)
+[[ -d "$HOME/.lmstudio/bin" ]] && export PATH="$PATH:$HOME/.lmstudio/bin"
+
+# ============================================================================
 # 1Password SSH Agent (macOS)
 # ============================================================================
 if [[ "$OSTYPE" == "darwin"* ]]; then
