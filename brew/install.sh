@@ -37,27 +37,18 @@ install_homebrew() {
         echo "Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-        # Add Homebrew to PATH based on OS
-        if [[ "$OS" == "macos" ]]; then
-            # Add to shell profiles for persistence
-            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile 2>/dev/null || true
-            echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile 2>/dev/null || true
-            # Try both Intel and Apple Silicon paths for current session
-            eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || eval "$(/usr/local/bin/brew shellenv)" 2>/dev/null
-        else
-            # Add to shell profiles for persistence on Linux
-            echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
-            echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.zprofile
-            # For current session
-            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" 2>/dev/null
-        fi
-        print_success "Homebrew installed and added to PATH"
+        # Source brew for current session (shell profiles are managed by dotfiles)
+        source_brew
+        print_success "Homebrew installed"
     else
         print_success "Homebrew already installed"
     fi
 }
 
 install_brew_packages() {
+    # Ensure brew is available before attempting to use it
+    ensure_brew
+
     # Only update if explicitly requested
     if [[ "${FORCE_BREW_UPDATE:-}" == "1" ]]; then
         echo "Updating Homebrew formulae..."
@@ -75,9 +66,11 @@ install_brew_packages() {
         local description="$2"
 
         if [[ -f "$DOTFILES_DIR/brew/$brewfile" ]]; then
-            brew bundle --file="$DOTFILES_DIR/brew/$brewfile" || {
-                print_warning "Some $description packages may have failed to install"
-            }
+            if ! brew bundle --file="$DOTFILES_DIR/brew/$brewfile"; then
+                print_error "Failed to install $description packages from $brewfile"
+                print_warning "You may need to run this script again or manually install packages"
+                return 1
+            fi
         else
             print_error "$brewfile not found"
             exit 1
