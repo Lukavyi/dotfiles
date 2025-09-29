@@ -42,10 +42,13 @@ const ItemSelector: FC<ItemSelectorProps> = ({
     <Box flexDirection="column">
       <Box>
         <Text color="green" bold>
-          🏠 Dotfiles Manager
+          🏠 Dotfiles Manager{' '}
         </Text>
-        <Text color="magenta" bold>
-          {' '}
+        <Text
+          backgroundColor={profile === 'work' ? 'blue' : 'yellow'}
+          color={profile === 'work' ? 'white' : 'black'}
+          bold
+        >
           [Profile: {profile === 'work' ? 'Work' : 'Personal'}]
         </Text>
       </Box>
