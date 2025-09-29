@@ -1,6 +1,12 @@
 # Personal CLI tools - for personal machines only
 # These are NOT installed on work machines
 
+# CLI tools moved from basic (potentially sensitive for work environments)
+brew "libarchive"    # Archive library
+brew "rclone"        # Cloud storage sync
+brew "rsync"         # File sync utility
+brew "smartmontools" # Disk monitoring
+
 # Personal developer tools
 tap "sst/tap"
 brew "claude-squad"

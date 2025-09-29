@@ -52,8 +52,4 @@ brew "chafa"         # Terminal graphics for image preview in Yazi
 brew "resvg"         # SVG rendering support for Yazi
 
 # CLI tools that work on both macOS and Linux
-brew "libarchive"    # Archive library
-brew "rclone"        # Cloud storage sync
-brew "rsync"         # File sync utility
-brew "smartmontools" # Disk monitoring
 brew "wget"          # Download tool
