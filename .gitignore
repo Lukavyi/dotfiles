@@ -61,6 +61,8 @@ zsh/.zshrc.local
 *.local
 .zprofile.local
 zsh/.zprofile.local
+.zshenv.local
+zsh/.zshenv.local
 
 # Backup files
 *.bak

@@ -37,6 +37,20 @@ create_local_config() {
     else
         print_success "~/.zshrc.local already exists"
     fi
+
+    if [[ ! -f ~/.zprofile.local ]]; then
+        echo "# Machine-specific login shell environment variables" > ~/.zprofile.local
+        print_warning "Created ~/.zprofile.local for machine-specific login settings"
+    else
+        print_success "~/.zprofile.local already exists"
+    fi
+
+    if [[ ! -f ~/.zshenv.local ]]; then
+        echo "# Machine-specific environment variables for all shells" > ~/.zshenv.local
+        print_warning "Created ~/.zshenv.local for machine-specific environment settings"
+    else
+        print_success "~/.zshenv.local already exists"
+    fi
 }
 
 # Main execution
