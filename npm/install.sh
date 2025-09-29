@@ -1,22 +1,21 @@
 #!/bin/bash
 set -e
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# Source common utilities
+source "$(dirname "$0")/../lib/common.sh"
 
 # Install global npm packages from package.json
-echo -e "${BLUE}Installing global npm packages from package.json...${NC}"
+print_info "Installing global npm packages from package.json..."
+
+# Ensure Homebrew is available (jq is needed for install-global script)
+ensure_brew
 
 # Change to the npm directory
 cd "$(dirname "$0")"
 
 # Check if package.json exists
 if [[ ! -f "package.json" ]]; then
-    echo -e "${RED}✗ package.json not found in npm directory${NC}"
+    print_error "package.json not found in npm directory"
     exit 1
 fi
 
@@ -34,18 +33,18 @@ if ! command -v npm &>/dev/null; then
 
     # Check again after potentially loading NVM
     if ! command -v npm &>/dev/null; then
-        echo -e "${RED}✗ npm is not installed. Please install Node.js via NVM first${NC}"
-        echo -e "${YELLOW}⚠ Run: nvm install --lts && nvm use --lts${NC}"
+        print_error "npm is not installed. Please install Node.js via NVM first"
+        print_warning "Run: nvm install --lts && nvm use --lts"
         exit 1
     fi
 fi
 
 # Install packages globally
 if npm run install-global; then
-    echo -e "${GREEN}✓ Global npm packages installed successfully!${NC}"
-    echo -e "${BLUE}Run 'npm list -g --depth=0' to see installed packages${NC}"
+    print_success "Global npm packages installed successfully!"
+    print_info "Run 'npm list -g --depth=0' to see installed packages"
 else
-    echo -e "${RED}✗ Failed to install npm packages${NC}"
-    echo -e "${YELLOW}⚠ You may need to run with sudo or fix npm permissions${NC}"
+    print_error "Failed to install npm packages"
+    print_warning "You may need to run with sudo or fix npm permissions"
     exit 1
 fi
