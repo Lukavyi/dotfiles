@@ -3,7 +3,6 @@
 
 # macOS-specific CLI tools
 brew "mas"  # Mac App Store CLI
-brew "ffmpeg"  # Media processing
 brew "libusb"  # USB library
 
 # Personal GUI applications (Casks)
