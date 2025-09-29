@@ -78,6 +78,9 @@ install_stow_configs() {
 main() {
     print_info "Setting up stow configurations..."
 
+    # Ensure Homebrew is available (so stow and git are in PATH)
+    ensure_brew
+
     # Check if stow is installed
     if ! command -v stow &>/dev/null; then
         print_error "GNU Stow is not installed. Please install it first."
