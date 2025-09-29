@@ -29,8 +29,8 @@ install_stow_configs() {
     # Change to dotfiles directory for stow to work properly
     cd "$DOTFILES_DIR"
 
-    # Stow each directory with --adopt to handle existing files
-    for dir in zsh git tmux p10k config; do
+    # Stow each directory with --adopt to handle existing files (excluding git)
+    for dir in zsh tmux p10k config; do
         if [[ -d "$dir" ]]; then
             echo "  Stowing $dir..."
             # Adopt existing files into our repo
@@ -38,8 +38,14 @@ install_stow_configs() {
         fi
     done
 
-    # Stow personal directory for personal profiles
+    # Stow git and personal directories for personal profiles only
     if [[ "$PROFILE" == "personal" ]]; then
+        if [[ -d "git" ]]; then
+            echo "  Stowing git..."
+            stow --adopt git
+            print_success "Git configuration linked"
+        fi
+
         if [[ -d "personal" ]]; then
             echo "  Stowing personal directory..."
             stow --adopt personal
