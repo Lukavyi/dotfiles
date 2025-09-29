@@ -46,6 +46,8 @@ brew "file-formula"  # File type detection for Yazi (required on Linux)
 brew "sevenzip"      # Archive operations for Yazi
 brew "poppler"       # PDF preview support for Yazi
 brew "imagemagick"   # Image processing for Yazi
+brew "ffmpegthumbnailer" # Video thumbnail generation for Yazi
+brew "unar"          # Universal archive extractor for Yazi
 
 # CLI tools that work on both macOS and Linux
 brew "libarchive"    # Archive library
