@@ -48,6 +48,8 @@ brew "poppler"       # PDF preview support for Yazi
 brew "imagemagick"   # Image processing for Yazi
 brew "ffmpegthumbnailer" # Video thumbnail generation for Yazi
 brew "unar"          # Universal archive extractor for Yazi
+brew "chafa"         # Terminal graphics for image preview in Yazi
+brew "resvg"         # SVG rendering support for Yazi
 
 # CLI tools that work on both macOS and Linux
 brew "libarchive"    # Archive library
