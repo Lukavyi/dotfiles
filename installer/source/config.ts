@@ -20,7 +20,7 @@ export const categories: Categories = {
       script: './brew/install.sh',
       details: [
         'Install Homebrew package manager if not present',
-        'Work: Install ~40 CLI tools from Brewfile.basic',
+        'Work: Install ~49 CLI tools from Brewfile.basic',
         'Personal: Also install personal CLI tools (claude-squad, pass, opencode)',
         'Personal macOS: Additionally install GUI apps and Mac App Store items',
         'Tools: git, neovim, tmux, fzf, ripgrep, bat, eza, lazygit',
@@ -37,10 +37,10 @@ export const categories: Categories = {
       details: [
         'Install Oh My Zsh framework',
         'Install plugins: zsh-syntax-highlighting, zsh-autosuggestions',
-        'Link: ~/.zshrc → zsh/.zshrc (16KB config)',
-        'Link: ~/.zshenv → zsh/.zshenv',
-        'Link: ~/.zprofile → zsh/.zprofile',
         'Create ~/.zshrc.local for machine-specific settings',
+        'Create ~/.zprofile.local for machine-specific login settings',
+        'Create ~/.zshenv.local for machine-specific environment settings',
+        'Note: Config files are linked by stow (see "Link configurations" item)',
       ],
     },
     {
@@ -50,9 +50,9 @@ export const categories: Categories = {
         'Fast, flexible, and beautiful Zsh theme with icons and git status',
       script: './p10k/install.sh',
       details: [
-        'Clone Powerlevel10k theme to ~/.oh-my-zsh/themes/',
-        'Link: ~/.p10k.zsh → p10k/.p10k.zsh (100KB config)',
+        'Clone Powerlevel10k theme to ~/.oh-my-zsh/custom/themes/',
         'Enables git status, icons, and command execution time in prompt',
+        'Note: .p10k.zsh config is linked by stow (see "Link configurations" item)',
       ],
     },
     {
@@ -62,9 +62,9 @@ export const categories: Categories = {
       script: './tmux/install.sh',
       details: [
         'Install Tmux Plugin Manager (TPM)',
-        'Link: ~/.tmux.conf → tmux/.tmux.conf (1.8KB config)',
-        'Plugins: tmux-sensible, tmux-resurrect, tmux-continuum',
-        'Custom keybindings and theme configuration',
+        'Install/update plugins: tmux-sensible, tmux-resurrect, tmux-continuum',
+        'Note: .tmux.conf is linked by stow (see "Link configurations" item)',
+        'Plugins provide session persistence and sensible defaults',
       ],
     },
   ],
@@ -93,11 +93,11 @@ export const categories: Categories = {
       script: './git/install.sh',
       profile: 'personal', // Only in personal profiles - contains personal git credentials
       details: [
-        'Link: ~/.gitconfig → git/.gitconfig',
-        'Configure git user.name and user.email',
-        'Set up SSH signing key for commits',
-        'Configure git aliases and diff tools',
-        'Platform-specific settings (macOS/Linux)',
+        'Generate ~/.gitconfig.local from pass password manager',
+        'Retrieves git user.name and user.email from pass',
+        'Retrieves SSH signing key from pass (if available)',
+        'Note: .gitconfig is linked by stow (see "Link configurations" item)',
+        'Requires pass (password-store) to be configured',
       ],
     },
     {
@@ -107,10 +107,11 @@ export const categories: Categories = {
       script: './claude/install.sh',
       profile: 'personal', // Only in personal profiles - contains API keys
       details: [
-        'Link: ~/.claude → claude/',
+        'Copy settings.json to ~/.claude/ with environment variable expansion',
+        'Copy .mcp.json to ~/.claude/ with API key substitution',
         'Configure MCP servers and tools',
-        'Set up API keys for Claude Code CLI',
-        'Install claude, opencode, claude-squad commands',
+        'Note: opencode, claude-squad commands installed via Brewfile.personal',
+        'Requires OPENROUTER_API_KEY and OPENAI_API_KEY environment variables',
       ],
     },
   ],
@@ -145,13 +146,13 @@ export const categories: Categories = {
       id: 'npm_packages',
       name: 'Global npm packages',
       description:
-        'Essential npm packages (typescript, prettier, eslint, etc.)',
+        'AI coding tools and package managers',
       script: './npm/install.sh',
       details: [
         'Install from npm/package.json',
-        'Packages: typescript, prettier, eslint',
-        'Tools: npm-check-updates, serve, lite-server',
-        'Utilities: trash-cli, gtop, speed-test',
+        'AI Tools: @anthropic-ai/claude-code, @just-every/code, @openai/codex',
+        'Usage tracking: ccusage',
+        'Package managers: corepack, yarn',
       ],
     },
     {
@@ -160,11 +161,11 @@ export const categories: Categories = {
       description: 'Neovim configuration with IDE-like features and plugins',
       script: './nvchad-custom/install.sh',
       details: [
-        'Clone NvChad base configuration',
-        'Link: ~/.config/nvim/lua/custom → nvchad-custom/',
-        'Install LSP servers for multiple languages',
+        'Clone NvChad starter configuration',
+        'Copy custom configurations to ~/.config/nvim/lua/',
+        'Files: chadrc.lua, mappings.lua, options.lua, conform.lua, plugins/init.lua',
         'Configure plugins: telescope, treesitter, mason, etc.',
-        'Set up IDE features: autocomplete, formatting, debugging',
+        'Set up IDE features: autocomplete, formatting, LSP support',
       ],
     },
   ],
