@@ -51,6 +51,9 @@ brew bundle --file=brew/Brewfile.macos    # macOS GUI apps (personal macOS only)
 # Link configurations
 stow zsh git tmux p10k config
 
+# Optional: Install Go-based tools (lazynpm)
+cd go-tools && bash install.sh && cd ..
+
 # Optional: Install npm packages
 cd npm && npm install -g && cd ..
 
@@ -108,6 +111,7 @@ stow -D config
 - `claude/` - Claude Code CLI configuration (MCP servers)
 - `config/` - Miscellaneous .config subdirectories (bat, gh, htop, thefuck, nvim)
 - `git/` - Git configuration with `.gitconfig.local.example` template
+- `go-tools/` - Go-based tools (lazynpm installed via `go install`)
 - `npm/` - Global NPM packages (cross-platform)
 - `p10k/` - Powerlevel10k Zsh theme configuration
 - `tmux/` - Tmux terminal multiplexer configuration

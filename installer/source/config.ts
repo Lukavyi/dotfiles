@@ -129,6 +129,19 @@ export const categories: Categories = {
       ],
     },
     {
+      id: 'go_tools',
+      name: 'Go-based tools',
+      description: 'Install Go-based development tools (lazynpm)',
+      script: './go-tools/install.sh',
+      details: [
+        'Install lazynpm via go install',
+        'Terminal UI for npm package management',
+        'Requires Go (installed via Homebrew)',
+        'Installs to $GOPATH/bin (~/go/bin by default)',
+        'Accessible via "lnpm" alias in .zshrc',
+      ],
+    },
+    {
       id: 'npm_packages',
       name: 'Global npm packages',
       description:

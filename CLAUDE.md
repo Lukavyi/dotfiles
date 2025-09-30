@@ -25,6 +25,7 @@ brew bundle --file=brew/Brewfile.personal # Personal CLI tools (add to basic)
 brew bundle --file=brew/Brewfile.macos    # macOS GUI apps and Mac App Store items
 stow zsh git tmux p10k config     # Link configurations
 cd nvm && bash install.sh && cd .. # Install Node Version Manager
+cd go-tools && bash install.sh && cd .. # Install Go-based tools (lazynpm)
 cd npm && npm install -g && cd .. # Install npm packages
 cd nvchad-custom && bash install.sh && cd .. # Install NvChad custom config
 cd claude && bash install.sh      # Install Claude config
@@ -97,6 +98,7 @@ The repository was drastically simplified:
 - **`claude/`** - Claude Code CLI configuration
 - **`config/`** - .config/ subdirectories (bat, gh, nvim, etc.)
 - **`git/`** - Git configuration
+- **`go-tools/`** - Go-based tools (lazynpm installed via `go install`)
 - **`installer/`** - Interactive installer UI (Ink-based TypeScript application)
   - Handles both installation and backup operations
   - Written in TypeScript with React/Ink
