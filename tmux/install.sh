@@ -32,6 +32,9 @@ install_tmux_tpm() {
 main() {
     print_info "Setting up Tmux Plugin Manager..."
 
+    # Ensure Homebrew is available (tmux is installed via brew)
+    ensure_brew
+
     # Check if tmux is installed
     if ! command -v tmux &>/dev/null; then
         print_warning "Tmux is not installed. Please install it first."
