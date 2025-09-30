@@ -5,9 +5,16 @@
 # ============================================================================
 # Base Configuration
 # ============================================================================
-export LANG='en_US.UTF-8'
-export LANGUAGE='en_US:en'
-export LC_ALL='en_US.UTF-8'
+# Use C.UTF-8 in Docker (always available), en_US.UTF-8 elsewhere
+if [[ -f /.dockerenv ]] || [[ -n "$DOCKER_CONTAINER" ]]; then
+    export LANG='C.UTF-8'
+    export LANGUAGE='C:en'
+    export LC_ALL='C.UTF-8'
+else
+    export LANG='en_US.UTF-8'
+    export LANGUAGE='en_US:en'
+    export LC_ALL='en_US.UTF-8'
+fi
 
 # ============================================================================
 # Powerlevel10k Instant Prompt
