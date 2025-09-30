@@ -9,6 +9,12 @@ install_oh_my_zsh() {
         echo "Installing Oh My Zsh..."
         KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
         print_success "Oh My Zsh installed"
+
+        # Remove Oh My Zsh's default .zshrc so stow can link our version
+        if [[ -f "$HOME/.zshrc" ]]; then
+            rm "$HOME/.zshrc"
+            print_info "Removed Oh My Zsh default .zshrc (will be replaced by dotfiles version)"
+        fi
     else
         print_success "Oh My Zsh already installed"
     fi
