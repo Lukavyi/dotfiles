@@ -19,24 +19,21 @@ if [[ ! -f "package.json" ]]; then
     exit 1
 fi
 
-# Check if npm is available (from NVM or system)
-if ! command -v npm &>/dev/null; then
-    # Try to load NVM if not already loaded
-    export NVM_DIR="$HOME/.nvm"
-    if [[ -s "/opt/homebrew/opt/nvm/nvm.sh" ]]; then
-        source "/opt/homebrew/opt/nvm/nvm.sh"
-    elif [[ -s "/usr/local/opt/nvm/nvm.sh" ]]; then
-        source "/usr/local/opt/nvm/nvm.sh"
-    elif [[ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]]; then
-        source "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
-    fi
+# Try to load NVM first to ensure NVM's Node/npm takes precedence over Docker/system versions
+export NVM_DIR="$HOME/.nvm"
+if [[ -s "/opt/homebrew/opt/nvm/nvm.sh" ]]; then
+    source "/opt/homebrew/opt/nvm/nvm.sh"
+elif [[ -s "/usr/local/opt/nvm/nvm.sh" ]]; then
+    source "/usr/local/opt/nvm/nvm.sh"
+elif [[ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]]; then
+    source "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"
+fi
 
-    # Check again after potentially loading NVM
-    if ! command -v npm &>/dev/null; then
-        print_error "npm is not installed. Please install Node.js via NVM first"
-        print_warning "Run: nvm install --lts && nvm use --lts"
-        exit 1
-    fi
+# Check if npm is available (from NVM or fallback to system)
+if ! command -v npm &>/dev/null; then
+    print_error "npm is not installed. Please install Node.js via NVM first"
+    print_warning "Run: nvm install --lts && nvm use --lts"
+    exit 1
 fi
 
 # Install packages globally
