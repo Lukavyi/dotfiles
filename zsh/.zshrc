@@ -239,6 +239,8 @@ alias l.="eza -ad .*"
 # Git aliases
 alias lg="lazygit"                                     # Terminal UI for git (from Synology-Homebrew)
 alias lzd="lazydocker"                                 # Terminal UI for Docker
+alias dcache="docker builder prune --all --force"     # Clear Docker build cache only (layers, intermediate images)
+alias dclean="docker system prune --all --force"      # Full cleanup: stopped containers, unused images, networks (not volumes)
 alias lnpm="lazynpm"                                   # Terminal UI for npm
 alias gst="git status"
 alias gd="git diff"
