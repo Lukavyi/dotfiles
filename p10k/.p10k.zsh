@@ -37,6 +37,7 @@
     context                 # user@hostname
     dir                     # current directory
     vcs                     # git status
+    worktree                # git worktree counter
     # =========================[ Line #2 ]=========================
     newline                 # \n
     prompt_char             # prompt symbol
@@ -1906,6 +1907,48 @@
   typeset -g POWERLEVEL9K_CLAUDE_FOREGROUND=117
   typeset -g POWERLEVEL9K_CLAUDE_BACKGROUND=236
   # typeset -g POWERLEVEL9K_CLAUDE_VISUAL_IDENTIFIER_EXPANSION='🤖'
+
+  # Git Worktree counter segment - shows number of worktrees when > 1
+  # Cache variables for worktree segment
+  typeset -g _WORKTREE_CACHE_TIME=0
+  typeset -g _WORKTREE_CACHE_COUNT=0
+  typeset -g _WORKTREE_CACHE_REPO=""
+
+  function prompt_worktree() {
+    # Only run if we're in a git repository
+    if ! git rev-parse --git-dir &>/dev/null; then
+      return
+    fi
+
+    local current_time=$(date +%s)
+    local current_repo=$(git rev-parse --show-toplevel 2>/dev/null)
+
+    # Check if we need to refresh cache (5 second timeout or different repo)
+    local cache_age=$((current_time - _WORKTREE_CACHE_TIME))
+
+    if [[ $cache_age -lt 5 && "$_WORKTREE_CACHE_REPO" == "$current_repo" ]]; then
+      # Use cached value
+      local count=$_WORKTREE_CACHE_COUNT
+    else
+      # Get fresh worktree count
+      local count=$(git worktree list --porcelain 2>/dev/null | grep -c "^worktree" || echo "0")
+
+      # Update cache
+      _WORKTREE_CACHE_TIME=$current_time
+      _WORKTREE_CACHE_COUNT=$count
+      _WORKTREE_CACHE_REPO=$current_repo
+    fi
+
+    # Only show if we have more than 1 worktree (main + additional)
+    if [[ $count -gt 1 ]]; then
+      p10k segment -f 87 -b 236 -i '🌲' -t "$count"
+    fi
+  }
+
+  # Worktree segment customization
+  typeset -g POWERLEVEL9K_WORKTREE_FOREGROUND=87  # Cyan
+  typeset -g POWERLEVEL9K_WORKTREE_BACKGROUND=236  # Dark gray
+  # typeset -g POWERLEVEL9K_WORKTREE_VISUAL_IDENTIFIER_EXPANSION='🌲'
 
   # Transient prompt works similarly to the builtin transient_rprompt option. It trims down prompt
   # when accepting a command line. Supported values:
