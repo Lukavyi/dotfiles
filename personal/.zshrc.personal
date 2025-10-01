@@ -37,45 +37,93 @@ esac
 # This keeps the local repository aware of remote changes for accurate prompt display
 
 function git_auto_fetch() {
-  if [[ -d .git ]]; then
-    # Get the remote URL to check if it's a GitHub repository
-    local remote_url=$(git config --get remote.origin.url 2>/dev/null)
+  # Quick check if we're in a git repo - this stays synchronous
+  [[ ! -d .git ]] && return
 
-    # Check if this is a GitHub repository
-    if [[ "$remote_url" =~ github\.com ]]; then
-      # For GitHub repos, use gh auth instead of local git config
-      # Check GitHub authentication status
-      if ! gh auth status &>/dev/null 2>&1; then
-        # Not logged in to GitHub CLI, skip fetch and notify user
-        echo "GitHub auto-fetch disabled: run 'gh auth login' to enable"
-        return
+  # Run all checks and fetch operations asynchronously
+  # Use disown to prevent job notifications
+  {
+    (
+      # Use a lockfile to prevent concurrent fetches for the same repo
+      local lockfile=".git/AUTO_FETCH_LOCK"
+      local fetch_marker=".git/LAST_AUTO_FETCH"
+
+      # Try to acquire lock (atomic operation)
+      # If lock exists and is less than 5 minutes old, skip
+      if [[ -f "$lockfile" ]]; then
+        local lock_age=$(( $(date +%s) - $(stat -f %m "$lockfile" 2>/dev/null || stat -c %Y "$lockfile" 2>/dev/null || echo 0) ))
+        if (( lock_age < 300 )); then
+          # Lock is fresh, another fetch is likely running
+          exit 0
+        else
+          # Stale lock, remove it
+          rm -f "$lockfile"
+        fi
       fi
-    else
-      # For non-GitHub repos, check if git user is configured
-      local user_email=$(git config --get user.email 2>/dev/null)
-      local user_name=$(git config --get user.name 2>/dev/null)
 
-      # Skip fetch if no user credentials for non-GitHub repos
-      if [[ -z "$user_email" ]] || [[ -z "$user_name" ]]; then
-        return
+      # Create lock file
+      echo $$ > "$lockfile"
+
+      # Ensure lock is removed on exit
+      trap "rm -f '$lockfile'" EXIT
+
+      # Check fetch throttle (60 seconds)
+      local current_time=$(date +%s)
+      local last_fetch=0
+      [[ -f $fetch_marker ]] && last_fetch=$(<$fetch_marker)
+
+      if (( current_time - last_fetch <= 60 )); then
+        # Too soon since last fetch
+        exit 0
       fi
-    fi
 
-    # Check if we can reach the remote (skip fetch if auth fails)
-    if ! git ls-remote --exit-code -h origin &>/dev/null 2>&1; then
-      return
-    fi
+      # Get the remote URL to check if it's a GitHub repository
+      local remote_url=$(git config --get remote.origin.url 2>/dev/null)
 
-    local fetch_marker=".git/LAST_AUTO_FETCH"
-    local current_time=$(date +%s)
-    local last_fetch=0
+      # Authentication checks based on repository type
+      if [[ "$remote_url" =~ github\.com ]]; then
+        # For GitHub repos, check gh auth
+        if ! gh auth status &>/dev/null 2>&1; then
+          # Not authenticated, create a marker file for user notification
+          # This way the main shell doesn't block on the message
+          echo "GitHub auto-fetch disabled: run 'gh auth login' to enable" > ".git/AUTO_FETCH_AUTH_MSG"
+          exit 0
+        fi
+      else
+        # For non-GitHub repos, check git credentials
+        local user_email=$(git config --get user.email 2>/dev/null)
+        local user_name=$(git config --get user.name 2>/dev/null)
 
-    [[ -f $fetch_marker ]] && last_fetch=$(<$fetch_marker)
+        if [[ -z "$user_email" ]] || [[ -z "$user_name" ]]; then
+          # No credentials configured
+          exit 0
+        fi
+      fi
 
-    # Only fetch if 1+ minute have passed
-    if (( current_time - last_fetch > 60 )); then
-      (git fetch --all &>/dev/null &)
-      echo $current_time > $fetch_marker
+      # Test connectivity to remote (this is the slowest operation)
+      if ! git ls-remote --exit-code -h origin &>/dev/null 2>&1; then
+        # Can't reach remote, skip fetch
+        exit 0
+      fi
+
+      # Perform the actual fetch
+      if git fetch --all &>/dev/null 2>&1; then
+        # Update timestamp only on successful fetch
+        echo $current_time > $fetch_marker
+      fi
+
+      # Clean up any auth message if fetch succeeded
+      rm -f ".git/AUTO_FETCH_AUTH_MSG"
+    ) &>/dev/null 2>&1 &
+  } &!
+
+  # Optionally display any pending auth messages (non-blocking)
+  if [[ -f .git/AUTO_FETCH_AUTH_MSG ]] && [[ -t 1 ]]; then
+    # Only show message if it's recent (less than 1 minute old)
+    local msg_age=$(( $(date +%s) - $(stat -f %m ".git/AUTO_FETCH_AUTH_MSG" 2>/dev/null || stat -c %Y ".git/AUTO_FETCH_AUTH_MSG" 2>/dev/null || echo 0) ))
+    if (( msg_age < 60 )); then
+      cat .git/AUTO_FETCH_AUTH_MSG
+      rm -f .git/AUTO_FETCH_AUTH_MSG
     fi
   fi
 }
