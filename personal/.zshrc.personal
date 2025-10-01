@@ -90,9 +90,10 @@ git_auto_fetch
 # ============================================================================
 # AI/Claude Development Tools
 # ============================================================================
-# MCP workaround: https://github.com/anthropics/claude-code/issues/5037
-alias claude="claude --mcp-config ~/.claude/.mcp.json"
-alias c="claude"
+# Claude Code CLI aliases
+alias claudem="claude --mcp-config ~/.claude/.mcp.json"  # With MCPs
+alias cm="claudem"                         # Short alias for claude with MCPs
+alias c="claude"                           # Short alias for basic claude
 alias oc="opencode"
 alias cs="claude-squad"
 

@@ -109,7 +109,8 @@ export const categories: Categories = {
       details: [
         'Copy settings.json to ~/.claude/ with environment variable expansion',
         'Copy .mcp.json to ~/.claude/ with API key substitution',
-        'Configure MCP servers and tools',
+        'Configure MCP servers: playwright, chrome-devtools, zen',
+        'Shell aliases: use "claudem" with MCPs, "claude" without',
         'Note: opencode, claude-squad commands installed via Brewfile.personal',
         'Requires OPENROUTER_API_KEY and OPENAI_API_KEY environment variables',
       ],

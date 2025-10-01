@@ -20,7 +20,7 @@ if [ -f .mcp.json ]; then
     # This ensures MCP servers are loaded properly when Claude starts
     envsubst '$HOME $OPENROUTER_API_KEY $OPENAI_API_KEY' < .mcp.json > ~/.claude/.mcp.json
     echo "✓ MCP configuration installed to ~/.claude/.mcp.json"
-    echo "  Note: Shell aliases are configured to use 'claude --mcp-config ~/.claude/.mcp.json'"
+    echo "  Use 'claudem' or 'cm' to run with MCPs, 'claude' or 'c' without"
 fi
 
 echo ""

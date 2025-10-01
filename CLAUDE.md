@@ -96,6 +96,10 @@ The repository was drastically simplified:
   - `Brewfile.macos` - macOS GUI apps (casks) and Mac App Store items
   - `backup.sh` - Smart backup with deduplication
 - **`claude/`** - Claude Code CLI configuration
+  - `settings.json` - Claude Code settings (model, permissions, statusLine)
+  - `.mcp.json` - MCP server configurations (playwright, chrome-devtools, zen)
+  - `install.sh` - Copies configs to ~/.claude/ with environment variable expansion
+  - Aliases: `claudem` (with MCPs) and `claude` (without MCPs)
 - **`config/`** - .config/ subdirectories (bat, gh, nvim, etc.)
 - **`git/`** - Git configuration
 - **`go-tools/`** - Go-based tools (lazynpm installed via `go install`)
@@ -134,6 +138,17 @@ The repository was drastically simplified:
 ### Check what's installed on macOS
 ```bash
 cd apps && ./check_apps.sh
+```
+
+### Use Claude Code CLI with/without MCPs
+```bash
+# Basic Claude (no MCPs)
+claude
+c         # Short alias
+
+# Claude with MCPs (playwright, chrome-devtools, zen)
+claudem
+cm        # Short alias
 ```
 
 ### Machine-specific configuration
