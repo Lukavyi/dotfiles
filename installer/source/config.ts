@@ -149,6 +149,7 @@ export const categories: Categories = {
       description:
         'AI coding tools and package managers',
       script: './npm/install.sh',
+      profile: 'personal', // Only in personal profiles - contains AI coding tools
       details: [
         'Install from npm/package.json',
         'AI Tools: @anthropic-ai/claude-code, @just-every/code, @openai/codex',

@@ -61,8 +61,13 @@ run_all_installations() {
 
     # Development
     bash "$DOTFILES_DIR/nvm/install.sh"
+
+    # npm global packages for personal profiles only (AI coding tools)
+    if [[ "$PROFILE" == "personal" ]]; then
+        bash "$DOTFILES_DIR/npm/install.sh"
+    fi
+
     bash "$DOTFILES_DIR/go-tools/install.sh"
-    bash "$DOTFILES_DIR/npm/install.sh"
     bash "$DOTFILES_DIR/nvchad-custom/install.sh"
 
     # macOS specific
