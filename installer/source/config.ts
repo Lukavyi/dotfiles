@@ -16,7 +16,7 @@ export const categories: Categories = {
     {
       id: 'homebrew',
       name: 'Homebrew & packages',
-      description: 'Package manager and all packages defined in Brewfile',
+      description: 'Package manager and packages (Work: basic tools only, Personal: includes AI tools)',
       script: './brew/install.sh',
       details: [
         'Install Homebrew package manager if not present',
@@ -32,7 +32,7 @@ export const categories: Categories = {
       id: 'zsh',
       name: 'Zsh with Oh My Zsh',
       description:
-        'Oh My Zsh framework with plugins (syntax highlighting, autosuggestions)',
+        'Oh My Zsh framework with plugins (Personal: includes git auto-fetch, AI aliases)',
       script: './zsh/install.sh',
       details: [
         'Install Oh My Zsh framework',
@@ -73,7 +73,7 @@ export const categories: Categories = {
       id: 'stow_configs',
       name: 'Link configurations (stow)',
       description:
-        'Create symlinks for all dotfiles using GNU Stow (zsh, git, tmux, etc.)',
+        'Create symlinks for dotfiles (Personal: includes .zshrc.personal with API keys)',
       script: './config/install.sh',
       profile: 'all', // Available for all profiles
       details: [

@@ -85,10 +85,17 @@ const ItemSelector: FC<ItemSelectorProps> = ({
             );
           }
 
+          // Determine the color based on selection state and profile
+          const itemColor = isSelected
+            ? 'yellow'
+            : item.profile === 'personal'
+              ? '#FFA500'  // Orange color for personal items
+              : 'white';
+
           return (
             <Box key={item.id} flexDirection="column" marginLeft={2}>
               <Box>
-                <Text color={isSelected ? 'yellow' : 'white'}>
+                <Text color={itemColor}>
                   {isSelected ? '> ' : '  '}[
                   {selections.includes(item.id) ? 'x' : ' '}] {item.name}
                 </Text>
