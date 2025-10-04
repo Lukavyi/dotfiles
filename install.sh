@@ -57,6 +57,9 @@ run_all_installations() {
 
         # Claude configuration for personal profiles
         bash "$DOTFILES_DIR/claude/install.sh"
+
+        # Claude Code Router for personal profiles
+        bash "$DOTFILES_DIR/claude-code-router/install.sh"
     fi
 
     # Development

@@ -141,7 +141,13 @@ git_auto_fetch
 # Claude Code CLI aliases
 alias claudem="claude --mcp-config ~/.claude/.mcp.json"  # With MCPs
 alias cm="claudem"                         # Short alias for claude with MCPs
-alias c="claude"                           # Short alias for basic claude
+alias c="claude"      # Short alias for basic claude (resets env)
+
+# Claude Code Router - Multi-provider routing
+alias cr="ccr code"                                      # Router without MCPs
+alias crm="ccr code --mcp-config ~/.claude/.mcp.json"    # Router with MCPs
+
+# Other AI tools
 alias oc="opencode"
 alias cs="claude-squad"
 

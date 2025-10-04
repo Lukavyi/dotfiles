@@ -115,6 +115,22 @@ export const categories: Categories = {
         'Requires OPENROUTER_API_KEY and OPENAI_API_KEY environment variables',
       ],
     },
+    {
+      id: 'claude_code_router',
+      name: 'Claude Code Router',
+      description: 'Multi-provider routing for Claude Code (OpenRouter, Anthropic, etc.)',
+      script: './claude-code-router/install.sh',
+      profile: 'personal', // Only in personal profiles - contains API keys
+      details: [
+        'Install @musistudio/claude-code-router npm package',
+        'Copy config.json to ~/.claude-code-router/ with API key substitution',
+        'Configure providers: OpenRouter (1M context), Anthropic',
+        'Default model: anthropic/claude-sonnet-4-5-20250929:extended',
+        'Shell aliases: use "ccr" without MCPs, "ccrm" with MCPs',
+        'Dynamic model switching with /model command',
+        'Requires OPENROUTER_API_KEY and optionally ANTHROPIC_API_KEY',
+      ],
+    },
   ],
   Development: [
     {
@@ -152,7 +168,8 @@ export const categories: Categories = {
       profile: 'personal', // Only in personal profiles - contains AI coding tools
       details: [
         'Install from npm/package.json',
-        'AI Tools: @anthropic-ai/claude-code, @just-every/code, @openai/codex',
+        'AI Tools: @anthropic-ai/claude-code, @musistudio/claude-code-router',
+        'Additional: @just-every/code, @openai/codex, happy-coder',
         'Usage tracking: ccusage',
         'Package managers: corepack, yarn',
       ],
