@@ -150,6 +150,7 @@ alias crm="ccr code --mcp-config ~/.claude/.mcp.json"    # Router with MCPs
 # Other AI tools
 alias oc="opencode"
 alias cs="claude-squad"
+alias h="happy"
 
 # ============================================================================
 # API Keys from pass
