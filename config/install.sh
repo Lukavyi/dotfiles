@@ -72,6 +72,13 @@ install_stow_configs() {
     fi
 
     print_success "Configuration files linked"
+
+    # Build bat cache if bat is installed and themes exist
+    if command -v bat &>/dev/null && [[ -d "$HOME/.config/bat/themes" ]]; then
+        echo "  Building bat theme cache..."
+        bat cache --build >/dev/null 2>&1 || true
+        print_success "Bat cache rebuilt with custom themes"
+    fi
 }
 
 # Main execution
