@@ -4,18 +4,18 @@ set -e
 # Source common utilities
 source "$(dirname "$0")/../lib/common.sh"
 
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Install global npm packages from package.json
 print_info "Installing global npm packages from package.json..."
 
 # Ensure Homebrew is available (jq is needed for install-global script)
 ensure_brew
 
-# Change to the npm directory
-cd "$(dirname "$0")"
-
 # Check if package.json exists
-if [[ ! -f "package.json" ]]; then
-    print_error "package.json not found in npm directory"
+if [[ ! -f "$SCRIPT_DIR/package.json" ]]; then
+    print_error "package.json not found in $SCRIPT_DIR"
     exit 1
 fi
 
@@ -37,7 +37,7 @@ if ! command -v npm &>/dev/null; then
 fi
 
 # Install packages globally
-if npm run install-global; then
+if (cd "$SCRIPT_DIR" && npm run install-global); then
     print_success "Global npm packages installed successfully!"
     print_info "Run 'npm list -g --depth=0' to see installed packages"
 else
