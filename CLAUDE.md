@@ -117,6 +117,7 @@ The repository was drastically simplified:
   - `Brewfile.macos` - macOS GUI apps (casks) and Mac App Store items
   - `backup.sh` - Smart backup with deduplication
 - **`claude/`** - Claude Code CLI configuration
+  - `CLAUDE.md` - System-wide instructions for Claude Code (tool preferences, research guidelines)
   - `settings.json` - Claude Code settings (model, permissions, statusLine)
   - `.mcp.json` - MCP server configurations (playwright, chrome-devtools, zen)
   - `install.sh` - Copies configs to ~/.claude/ with environment variable expansion
@@ -171,6 +172,14 @@ c         # Short alias
 claudem
 cm        # Short alias
 ```
+
+### Claude Code configuration
+The `claude/CLAUDE.md` file contains system-wide instructions that apply to all Claude Code sessions:
+- Tool aliases (grep→rg, find→fd, cd→z)
+- Critical evaluation guidelines
+- Research best practices
+
+Each project can have its own `CLAUDE.md` in the project root for project-specific instructions. Claude Code will load both files.
 
 ### Machine-specific configuration
 Use `~/.zshrc.local` for machine-specific settings (created automatically by install.sh)

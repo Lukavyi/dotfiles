@@ -26,6 +26,12 @@ if [ -f "$SCRIPT_DIR/.mcp.json" ]; then
     echo "  Use 'claudem' or 'cm' to run with MCPs, 'claude' or 'c' without"
 fi
 
+# CLAUDE.md system-wide instructions
+if [ -f "$SCRIPT_DIR/CLAUDE.md" ]; then
+    cp "$SCRIPT_DIR/CLAUDE.md" ~/.claude/CLAUDE.md
+    echo "✓ System-wide Claude instructions installed to ~/.claude/CLAUDE.md"
+fi
+
 echo ""
 echo "Claude Code configuration installed successfully!"
 echo "Note: You may need to restart Claude Code for changes to take effect."
