@@ -49,6 +49,27 @@ stow zsh git tmux p10k config
 stow -D zsh git tmux p10k config
 ```
 
+### Security - Pre-commit Hooks
+```bash
+# Pre-commit hooks are automatically installed by install.sh
+# They scan for secrets/API keys before each commit
+
+# Manual installation (if needed)
+pre-commit install
+pre-commit install --hook-type pre-push
+
+# Run manually
+pre-commit run --all-files
+
+# Bypass for a single commit (use sparingly!)
+SKIP=gitleaks git commit -m 'message'
+
+# Update gitleaks to latest version
+pre-commit autoupdate
+```
+
+**Note:** Git hooks are local only and not version controlled. Anyone cloning this repo must run `./install.sh` to set up the hooks automatically.
+
 ## Scripts
 
 ### Core Scripts (simplified)

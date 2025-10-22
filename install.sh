@@ -143,6 +143,14 @@ main() {
             echo "  2. Check missing apps: cd apps && ./check_apps.sh"
         fi
     fi
+
+    # Install pre-commit hooks (runs for both interactive and non-interactive modes)
+    if command -v pre-commit &>/dev/null; then
+        echo ""
+        print_info "Installing pre-commit hooks for dotfiles repository..."
+        pre-commit install &>/dev/null && pre-commit install --hook-type pre-push &>/dev/null
+        print_success "Pre-commit hooks installed"
+    fi
 }
 
 # Run main function
