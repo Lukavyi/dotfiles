@@ -1,0 +1,8 @@
+# Linux-specific packages
+# These packages are only available/needed on Linux systems
+
+# GNU C Library - Linux standard C library
+brew "glibc"
+
+# System call tracer for debugging (use dtruss/dtrace on macOS)
+brew "strace"

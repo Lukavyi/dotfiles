@@ -31,8 +31,8 @@ backup_brew() {
     EXISTING_CASKS=$(mktemp)
     EXISTING_MAS=$(mktemp)
 
-    # Combine from all three Brewfiles
-    for brewfile in "$DOTFILES_DIR/brew/Brewfile.basic" "$DOTFILES_DIR/brew/Brewfile.personal" "$DOTFILES_DIR/brew/Brewfile.macos"; do
+    # Combine from all Brewfiles
+    for brewfile in "$DOTFILES_DIR/brew/Brewfile.basic" "$DOTFILES_DIR/brew/Brewfile.personal" "$DOTFILES_DIR/brew/Brewfile.macos" "$DOTFILES_DIR/brew/Brewfile.linux"; do
         extract_items "$brewfile" "tap" >> "$EXISTING_TAPS"
         extract_items "$brewfile" "brew" >> "$EXISTING_BREWS"
         extract_items "$brewfile" "cask" >> "$EXISTING_CASKS"

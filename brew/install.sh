@@ -83,6 +83,11 @@ install_brew_packages() {
     # All profiles get basic packages
     install_brewfile "Brewfile.basic" "basic"
 
+    # Install Linux-specific packages on Linux (all profiles)
+    if [[ "$OS" == "linux" ]]; then
+        install_brewfile "Brewfile.linux" "Linux-specific"
+    fi
+
     # Personal profiles get additional packages
     case "$PROFILE" in
         work)

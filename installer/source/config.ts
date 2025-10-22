@@ -21,6 +21,7 @@ export const categories: Categories = {
       details: [
         'Install Homebrew package manager if not present',
         'Work: Install ~49 CLI tools from Brewfile.basic',
+        'Linux: Also install Linux-specific packages (glibc, strace)',
         'Personal: Also install personal CLI tools (claude-squad, pass, opencode)',
         'Personal macOS: Additionally install GUI apps and Mac App Store items',
         'Tools: git, neovim, tmux, fzf, ripgrep, bat, eza, lazygit',
@@ -213,9 +214,9 @@ export const categories: Categories = {
       profile: 'all', // Available in both profiles
       details: [
         'Export installed Homebrew packages',
-        'Update Brewfile.basic, Brewfile.personal, and Brewfile.macos',
+        'Update Brewfile.basic, Brewfile.personal, Brewfile.macos, and Brewfile.linux',
         'Include: formulae, casks, taps, and Mac App Store apps',
-        'Smart deduplication between basic and full profiles',
+        'Smart deduplication between all Brewfiles',
       ],
     },
     {
