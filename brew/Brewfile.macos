@@ -61,7 +61,6 @@ cask "soundsource"
 cask "thebrowsercompany-dia"
 cask "vlc"
 cask "webstorm"
-cask "xmind"
 cask "yubico-authenticator"
 cask "zoom"
 
@@ -69,13 +68,10 @@ cask "zoom"
 mas "1Password for Safari", id: 1569813296
 mas "Accelerate", id: 1459809092
 mas "Actions", id: 1586435171
-mas "Affinity Photo 2", id: 1616822987
 mas "Amphetamine", id: 937984704
 mas "Blackmagic Disk Speed Test", id: 425264550
-mas "Craft", id: 1487937127
 mas "Craft Web Clipper", id: 6748613311
 mas "Data Jar", id: 1453273600
-mas "DaVinci Resolve", id: 571213070
 mas "Dropover", id: 1355679052
 mas "Fantastical", id: 975937182
 mas "FileZilla Pro - FTP and Cloud", id: 1298486723

@@ -3,10 +3,13 @@
 # Apps in Brewfile.macos are excluded from this list
 
 manual:
+  - "Affinity Photo 2"
   - "AutoRaise"
   - "Blackmagic Proxy Generator"
   - "Captions"
   - "Comet"
+  - "Craft"
+  - "DaVinci Resolve"
   - "Epidemic Sound Hub"
   - "FileZilla"
   - "Frame.io Transfer"
@@ -19,6 +22,7 @@ manual:
   - "Safari"
   - "SigmaOS 1Password Linker"
   - "Supercharge"
+  - "Xmind"
   - "Blackmagic Fusion 18"
   - "Blackmagic Fusion 18 Render Node"
   - "Blackmagic RAW"
