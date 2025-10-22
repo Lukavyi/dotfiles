@@ -21,7 +21,7 @@ fi
 if [ -f "$SCRIPT_DIR/.mcp.json" ]; then
     # Copy .mcp.json to ~/.claude/ directory with variable substitution
     # This ensures MCP servers are loaded properly when Claude starts
-    envsubst '$HOME $OPENROUTER_API_KEY $OPENAI_API_KEY' < "$SCRIPT_DIR/.mcp.json" > ~/.claude/.mcp.json
+    envsubst '$HOME' < "$SCRIPT_DIR/.mcp.json" > ~/.claude/.mcp.json
     echo "✓ MCP configuration installed to ~/.claude/.mcp.json"
     echo "  Use 'claudem' or 'cm' to run with MCPs, 'claude' or 'c' without"
 fi
