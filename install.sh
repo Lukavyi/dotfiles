@@ -60,6 +60,9 @@ run_all_installations() {
 
         # Claude Code Router for personal profiles
         bash "$DOTFILES_DIR/claude-code-router/install.sh"
+
+        # Chunkhound for personal profiles (AI code search and indexing)
+        bash "$DOTFILES_DIR/chunkhound/install.sh"
     fi
 
     # Development

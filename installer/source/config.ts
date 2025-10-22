@@ -131,6 +131,22 @@ export const categories: Categories = {
         'Requires OPENROUTER_API_KEY and optionally ANTHROPIC_API_KEY',
       ],
     },
+    {
+      id: 'chunkhound',
+      name: 'Chunkhound',
+      description: 'AI-powered code search and indexing with MCP server support',
+      script: './chunkhound/install.sh',
+      profile: 'personal', // Only in personal profiles - AI coding tool
+      details: [
+        'Install chunkhound via uv tool install',
+        'Semantic code search across 22+ programming languages',
+        'Integrates with Claude Code as MCP server',
+        'Index projects: chunkhound index /path/to/project',
+        'Configure per-project by adding .mcp.json with chunkhound server',
+        'Supports multiple embedding providers (VoyageAI, OpenAI, Ollama)',
+        'Requires uv (installed via Homebrew)',
+      ],
+    },
   ],
   Development: [
     {
