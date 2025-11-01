@@ -117,10 +117,12 @@ The repository was drastically simplified:
   - `Brewfile.macos` - macOS GUI apps (casks) and Mac App Store items
   - `backup.sh` - Smart backup with deduplication
 - **`claude/`** - Claude Code CLI configuration
-  - `CLAUDE.md` - System-wide instructions for Claude Code (tool preferences, research guidelines)
-  - `settings.json` - Claude Code settings (model, permissions, statusLine)
-  - `.mcp.json` - MCP server configurations (playwright, chrome-devtools, zen)
-  - `install.sh` - Copies configs to ~/.claude/ with environment variable expansion
+  - `.claude/` - Stow package directory (symlinked to ~/.claude/)
+    - `CLAUDE.md` - System-wide instructions for Claude Code (tool preferences, research guidelines)
+    - `settings.json` - Claude Code settings (model, permissions, statusLine)
+    - `.mcp.json` - MCP server configurations (playwright, chrome-devtools, zen)
+  - `install.sh` - Uses stow to symlink configs (no variable expansion needed)
+  - **Auto-sync**: Files are symlinked, edits in either location sync automatically
   - Aliases: `claudem` (with MCPs) and `claude` (without MCPs)
 - **`config/`** - .config/ subdirectories (bat, gh, nvim, etc.)
 - **`git/`** - Git configuration
@@ -174,12 +176,23 @@ cm        # Short alias
 ```
 
 ### Claude Code configuration
-The `claude/CLAUDE.md` file contains system-wide instructions that apply to all Claude Code sessions:
+
+**File sync behavior:**
+- All Claude configs are **symlinked** via stow (not copied)
+- Edit `dotfiles/claude/.claude/CLAUDE.md` or `~/.claude/CLAUDE.md` - they're the same file
+- Changes sync automatically, no need to re-run install
+
+**System-wide instructions:**
+The `claude/.claude/CLAUDE.md` file contains system-wide instructions that apply to all Claude Code sessions:
 - Tool aliases (grep→rg, find→fd, cd→z)
 - Critical evaluation guidelines
 - Research best practices
 
 Each project can have its own `CLAUDE.md` in the project root for project-specific instructions. Claude Code will load both files.
+
+**Note:** New files created by Claude Code in `~/.claude/` are NOT automatically synced to the dotfiles repo. To add them:
+1. Copy new files to `dotfiles/claude/.claude/`
+2. Re-run `cd claude && bash install.sh`
 
 ### Machine-specific configuration
 Use `~/.zshrc.local` for machine-specific settings (created automatically by install.sh)

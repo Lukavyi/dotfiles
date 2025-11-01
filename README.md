@@ -108,7 +108,7 @@ stow -D config
 
 - `apps/` - Application inventory and installation tracking (macOS)
 - `brew/` - Homebrew packages (Brewfile.basic for work, Brewfile.personal for personal CLI, Brewfile.macos for GUI apps)
-- `claude/` - Claude Code CLI configuration (MCP servers)
+- `claude/` - Claude Code CLI configuration (MCP servers, symlinked via stow)
 - `config/` - Miscellaneous .config subdirectories (bat, gh, htop, thefuck, nvim)
 - `git/` - Git configuration with `.gitconfig.local.example` template
 - `go-tools/` - Go-based tools (lazynpm installed via `go install`)

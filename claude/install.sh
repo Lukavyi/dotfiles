@@ -2,36 +2,34 @@
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 
-# Install Claude configurations
+# Install Claude configurations using stow
 
 echo "Setting up Claude configurations..."
 
-# Claude Code CLI settings (including MCP servers)
-if [ -f "$SCRIPT_DIR/settings.json" ]; then
-    mkdir -p ~/.claude
-    # Expand only $HOME variable in settings.json, preserving $schema
-    envsubst '$HOME' < "$SCRIPT_DIR/settings.json" > ~/.claude/settings.json
-    echo "✓ Claude Code settings installed to ~/.claude/settings.json"
-fi
+# Use stow to symlink all claude configs
+# This keeps all files in sync automatically - no manual copying needed
+if command -v stow >/dev/null 2>&1; then
+    # Stow from the parent dotfiles directory (standard pattern)
+    # --adopt will take any existing files in ~/.claude/ and move them into the repo
+    # This lets you see diffs (git diff) and decide whether to keep or revert changes
+    cd "$DOTFILES_DIR"
+    stow --adopt claude
 
-# MCP servers configuration
-# Workaround for GitHub issue #5037: MCP servers not loading from subdirectories
-# https://github.com/anthropics/claude-code/issues/5037
-if [ -f "$SCRIPT_DIR/.mcp.json" ]; then
-    # Copy .mcp.json to ~/.claude/ directory with variable substitution
-    # This ensures MCP servers are loaded properly when Claude starts
-    envsubst '$HOME' < "$SCRIPT_DIR/.mcp.json" > ~/.claude/.mcp.json
-    echo "✓ MCP configuration installed to ~/.claude/.mcp.json"
+    echo "✓ Claude Code configurations symlinked to ~/.claude/"
+    echo "  - CLAUDE.md (system-wide instructions)"
+    echo "  - settings.json (Claude Code settings)"
+    echo "  - .mcp.json (MCP server configurations)"
+    echo ""
     echo "  Use 'claudem' or 'cm' to run with MCPs, 'claude' or 'c' without"
-fi
-
-# CLAUDE.md system-wide instructions
-if [ -f "$SCRIPT_DIR/CLAUDE.md" ]; then
-    cp "$SCRIPT_DIR/CLAUDE.md" ~/.claude/CLAUDE.md
-    echo "✓ System-wide Claude instructions installed to ~/.claude/CLAUDE.md"
+else
+    echo "✗ stow not found. Please install stow first:"
+    echo "  macOS: brew install stow"
+    echo "  Linux: sudo apt install stow"
+    exit 1
 fi
 
 echo ""
 echo "Claude Code configuration installed successfully!"
-echo "Note: You may need to restart Claude Code for changes to take effect."
+echo "Note: Files are now symlinked - any edits sync automatically!"

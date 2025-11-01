@@ -16,7 +16,8 @@ npm
 
 # Documentation
 README.md
-CLAUDE.md
+# Note: CLAUDE.md in claude/.claude/ needs to be stowed, so we don't globally ignore it
+# The root CLAUDE.md won't be stowed anyway since we never stow the root directory
 
 # Scripts (remain in repo root)
 install.sh

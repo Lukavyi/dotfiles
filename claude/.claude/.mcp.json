@@ -9,13 +9,13 @@
       "args": ["chrome-devtools-mcp@latest"]
     },
     "zen": {
-      "command": "bash",
+      "command": "uvx",
       "args": [
-        "-c",
-        "for p in $(which uvx 2>/dev/null) $HOME/.local/bin/uvx /opt/homebrew/bin/uvx /usr/local/bin/uvx uvx; do [ -x \"$p\" ] && exec \"$p\" --from git+https://github.com/BeehiveInnovations/zen-mcp-server.git zen-mcp-server; done; echo 'uvx not found' >&2; exit 1"
+        "--from",
+        "git+https://github.com/BeehiveInnovations/zen-mcp-server.git",
+        "zen-mcp-server"
       ],
       "env": {
-        "PYTHONPATH": "${HOME}/.local/share/mcp-servers/zen-mcp-server",
         "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}",
         "OPENAI_API_KEY": "${OPENAI_API_KEY}"
       }
