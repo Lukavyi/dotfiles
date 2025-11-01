@@ -41,3 +41,4 @@ When exploring codebases or researching solutions:
 ---
 
 **Note:** Project-specific instructions should be placed in each project's own `CLAUDE.md` file in the project root. This file contains only system-wide preferences.
+- don't mention Claude Code in commit messages or PRs
