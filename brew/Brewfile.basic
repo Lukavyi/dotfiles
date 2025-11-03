@@ -39,6 +39,9 @@ brew "zoxide"
 brew "zsh"
 brew "coreutils"
 
+# Claude Code CLI - AI coding assistant
+cask "claude-code"
+
 # Terminal file manager (blazing fast, written in Rust)
 brew "yazi"
 # Dependencies for Yazi file manager

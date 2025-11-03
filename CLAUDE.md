@@ -20,7 +20,7 @@ This is a minimal personal dotfiles repository managed with GNU Stow for macOS a
 ./install.sh --non-interactive --personal # Personal profile: auto-detects OS for appropriate tools
 
 # Manual installation
-brew bundle --file=brew/Brewfile.basic    # Work profile: work-safe tools only
+brew bundle --file=brew/Brewfile.basic    # Work profile: work-safe tools (includes Claude Code CLI)
 brew bundle --file=brew/Brewfile.personal # Personal CLI tools (add to basic)
 brew bundle --file=brew/Brewfile.macos    # macOS GUI apps and Mac App Store items
 stow zsh git tmux p10k config     # Link configurations
@@ -112,11 +112,12 @@ The repository was drastically simplified:
   - `check_apps.sh` - Scans and inventories installed apps
   - `backup.sh` - Updates apps.yml inventory
 - **`brew/`** - Homebrew configuration
-  - `Brewfile.basic` - Work-safe essential tools
+  - `Brewfile.basic` - Work-safe essential tools (includes Claude Code CLI)
   - `Brewfile.personal` - Personal CLI tools (claude-squad, pass, opencode, ffmpeg, libusb)
   - `Brewfile.macos` - macOS GUI apps (casks) and Mac App Store items
   - `backup.sh` - Smart backup with deduplication
-- **`claude/`** - Claude Code CLI configuration
+- **`claude/`** - Claude Code configuration files
+  - **Note**: Claude Code CLI installed via Homebrew (brew/Brewfile.basic)
   - `.claude/` - Stow package directory (symlinked to ~/.claude/)
     - `CLAUDE.md` - System-wide instructions for Claude Code (tool preferences, research guidelines)
     - `settings.json` - Claude Code settings (model, permissions, statusLine)
@@ -166,6 +167,9 @@ cd apps && ./check_apps.sh
 
 ### Use Claude Code CLI with/without MCPs
 ```bash
+# Claude Code CLI is installed via Homebrew (brew/Brewfile.basic)
+# Configuration files are symlinked via claude/install.sh
+
 # Basic Claude (no MCPs)
 claude
 c         # Short alias
@@ -176,6 +180,10 @@ cm        # Short alias
 ```
 
 ### Claude Code configuration
+
+**Installation:**
+- Claude Code CLI installed via Homebrew cask (brew/Brewfile.basic)
+- Configuration files symlinked via stow (claude/install.sh)
 
 **File sync behavior:**
 - All Claude configs are **symlinked** via stow (not copied)

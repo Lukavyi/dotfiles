@@ -185,8 +185,9 @@ export const categories: Categories = {
       profile: 'personal', // Only in personal profiles - contains AI coding tools
       details: [
         'Install from npm/package.json',
-        'AI Tools: @anthropic-ai/claude-code, @musistudio/claude-code-router',
-        'Additional: @just-every/code, @openai/codex, happy-coder',
+        'AI Tools: @musistudio/claude-code-router, @just-every/code, @openai/codex',
+        'Note: Claude Code CLI installed via Homebrew (brew/Brewfile.basic)',
+        'Additional: happy-coder',
         'Usage tracking: ccusage',
         'Package managers: corepack, yarn',
       ],
