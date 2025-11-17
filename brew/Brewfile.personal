@@ -11,5 +11,6 @@ brew "smartmontools" # Disk monitoring
 tap "sst/tap"
 brew "claude-squad"
 brew "pass"
+brew "repomix"
 brew "sst/tap/opencode"
 brew "ffmpeg"
