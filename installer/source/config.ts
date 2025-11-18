@@ -164,6 +164,20 @@ export const categories: Categories = {
       ],
     },
     {
+      id: 'bun',
+      name: 'Bun',
+      description: 'Fast JavaScript runtime and toolkit (alternative to Node.js)',
+      script: './bun/install.sh',
+      details: [
+        'Install Bun via official installer (curl | bash)',
+        'Fast all-in-one JavaScript runtime (replaces Node.js, npm, webpack, etc.)',
+        'Built-in bundler, transpiler, task runner, and package manager',
+        'Drop-in replacement for Node.js with faster startup and execution',
+        'Native TypeScript & JSX support without configuration',
+        'Installed to ~/.bun/bin with automatic PATH configuration',
+      ],
+    },
+    {
       id: 'go_tools',
       name: 'Go-based tools',
       description: 'Install Go-based development tools (lazynpm)',

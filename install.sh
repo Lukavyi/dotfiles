@@ -67,6 +67,7 @@ run_all_installations() {
 
     # Development
     bash "$DOTFILES_DIR/nvm/install.sh"
+    bash "$DOTFILES_DIR/bun/install.sh"
 
     # npm global packages for personal profiles only (AI coding tools)
     if [[ "$PROFILE" == "personal" ]]; then
